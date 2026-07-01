@@ -8,47 +8,13 @@ export class UserService {
 
     constructor(
         @InjectRepository(Usuario)
-        private usuarioRepository: Repository<Usuario>,
-        private jwtService: JwtService,
+        private usuarioRepository: Repository<Usuario>, 
     ) {}
 
-    async login(email: string,senha: string){
-     try{
+    async findByEmail(email: string): Promise<Usuario | null>{
+        return this.usuarioRepository.findOne({ where: {email}});
+    }
+
    
-        const usuario = await this.usuarioRepository.findOne({
-            where: { email },
-        });
 
-        if (!usuario){
-            throw new UnauthorizedException('Dado inválido',);
-        }
-
-        if (usuario.senha !== senha){
-            throw new UnauthorizedException('Dados inválidos',);
-        }
-        const payload = {
-            sub: usuario.usuarioId,
-            nome: usuario.nome,
-            perfil: usuario.perfil,
-        }
-
-        const token_acesso = await this.jwtService.signAsync(payload);
-        
-        return {
-            token_acesso,
-            usuario: {
-                id: usuario.usuarioId,
-                nome: usuario.nome,
-                perfil: usuario.perfil,
-            },
-        };
-    } catch (error) {
-      if (error instanceof HttpException){
-        throw error;
-      }
-      throw new InternalServerErrorException('Erro interno do servido')
-        
-    }
-
-    }
 }

@@ -7,21 +7,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { config } from 'process';
 @Module({
-    imports:[
-        TypeOrmModule.forFeature([Usuario]),
-        JwtModule.registerAsync({
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            useFactory: (config: ConfigService) => ({
-                secret: config.get<string>('JWT_SECRET'),
-                signOptions:{
-                    expiresIn: config.get<string>('JWT_EXPIRES_IN') as any,
-                },
-            }),
-        }),
-    ],
-    controllers: [UserController],
-    providers: [UserService],
+   imports: [TypeOrmModule.forFeature([Usuario])],
+   providers: [UserService],
+   exports: [UserService],
     
 })
 export class UserModule {}
