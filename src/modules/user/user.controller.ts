@@ -1,5 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { UserService } from './user.service';
+import { Validate } from 'class-validator';
+import { LoginDto } from './dto/dto.login';
 @Controller('user')
 export class UserController {
     constructor(
@@ -7,10 +9,8 @@ export class UserController {
     ){}
 
     @Post('login')
-    login(@Body() body: any){
-        return this.userService.login(
-            body.email,
-            body.senha,
-        );
+    @UsePipes(new ValidationPipe())
+    login(@Body() body: LoginDto){
+        return this.userService.login(body.email, body.senha)
     }
 }
