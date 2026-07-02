@@ -7,10 +7,10 @@ export class JwtAuthGuard extends AuthGuard('jwt'){
 
     handleRequest(err: any, user: any, info: any){
         if(info instanceof TokenExpiredError){
-            throw new UnauthorizedException('Token expirado');
+            throw new UnauthorizedException('Usuário não existe');
         }
         if (info instanceof JsonWebTokenError){
-            throw new UnauthorizedException('Token inválido');
+            throw new UnauthorizedException('Usuário não existe');
 
         }
 
