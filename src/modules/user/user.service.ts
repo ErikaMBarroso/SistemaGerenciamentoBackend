@@ -2,7 +2,7 @@ import { HttpException, Injectable, InternalServerErrorException, UnauthorizedEx
 import { InjectRepository } from '@nestjs/typeorm';
 import { Usuario } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { JwtService } from '@nestjs/jwt';
+
 @Injectable()
 export class UserService {
 

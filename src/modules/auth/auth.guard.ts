@@ -1,5 +1,5 @@
 import { ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
-import { JsonWebTokenError, TokenExpiredError } from "@nestjs/jwt";
+import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { AuthGuard } from "@nestjs/passport";
 
 @Injectable()
