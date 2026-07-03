@@ -6,7 +6,7 @@ import { Observable } from "rxjs";
 export class RolesGuard implements CanActivate{
     constructor(private reflector: Reflector){}
     canActivate(context: ExecutionContext): boolean {
-        const perfisPermitidos = this.reflector.get<string[]>('perfil', context.getHandler());
+        const perfisPermitidos = this.reflector.getAllAndOverride<string[]>('perfil', [context.getHandler(),context.getClass()]);
         
         if(!perfisPermitidos) return true;
 
