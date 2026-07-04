@@ -8,7 +8,6 @@ export class AuthController{
 
     @Post('login')
     @HttpCode(HttpStatus.OK)
-    @UsePipes(new ValidationPipe())
     login(@Body() body: LoginDto){
         return this.authService.login(body.email, body.senha);
     }
