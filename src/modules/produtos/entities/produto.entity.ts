@@ -13,12 +13,15 @@ export class Produto{
     descricao!: string;
 
     @Column()
+    marca!: string;
+
+    @Column()
     preco!: number;
 
     @Column()
     quantidade!: number;
 
-    @Column()
+    @Column({name: 'quantidade_min'})
     quantidadeMin!: number;
 
 }
