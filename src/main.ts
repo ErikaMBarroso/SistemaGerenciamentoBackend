@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -9,6 +10,16 @@ async function bootstrap() {
     forbidNonWhitelisted: true,
     transform: true,
   }));
+
+  const config = new DocumentBuilder()
+  .setTitle('testa')
+  .setDescription('testando')
+  .setVersion('1.0')
+  .build();
+
+  const documenter = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, documenter);
+
 
   await app.listen(process.env.PORT ?? 3001);
 }
