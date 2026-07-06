@@ -25,11 +25,18 @@ export class ProdutosController {
         return this.produtoService.consultaTodos();
     }
 
+
+@Get(':id')
+@Perfis('administrador')
+consultaUnica(@Param('id', ParseIntPipe) id: number,){
+     
+    return this.produtoService.consultaUnica(id)
+}
+
 @Put(':id')
 @Perfis('administrador')
 atualizar(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: AtualizaProduto,
+    @Param('id', ParseIntPipe) id: number, @Body() dto: AtualizaProduto,
 ) {
     return this.produtoService.atualizar(id, dto);
 }
