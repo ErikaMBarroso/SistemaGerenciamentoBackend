@@ -12,8 +12,9 @@ async function bootstrap() {
   }));
 
   const config = new DocumentBuilder()
-  .setTitle('testa')
-  .setDescription('testando')
+  .setTitle('Sistema de Gerenciamento para Pet Shop')
+  .setDescription('O Sistema de Gerenciamento para Pet Shop é uma aplicação web desenvolvida para centralizar e facilitar o gerenciamento das operações de um pet shop')
+  .addBearerAuth()
   .setVersion('1.0')
   .build();
 
