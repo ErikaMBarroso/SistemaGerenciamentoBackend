@@ -1,15 +1,15 @@
-import { Column, PrimaryGeneratedColumn } from "typeorm";
-export class MovimentacaoEstoque{
-@PrimaryGeneratedColumn()
-id!: number;
+// import { Column, PrimaryGeneratedColumn } from "typeorm";
+// export class MovimentacaoEstoque{
+// @PrimaryGeneratedColumn()
+// id!: number;
 
-@Column()
-tipo!: 'entrada' | 'saida';
+// @Column()
+// tipo!: 'entrada' | 'saida';
 
-@Column()
-quantidade!: number;
+// @Column()
+// quantidade!: number;
 
-@Column({name: 'data_movimentacao'})
-dataMovimentacao!: Date;
+// @Column({name: 'data_movimentacao'})
+// dataMovimentacao!: Date;
 
-}
+// }

@@ -8,7 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProdutosModule } from './modules/produtos/produtos.module';
-import { MovimentacaoModule } from './modules/movimentacao/movimentacao.module';
+// import { MovimentacaoModule } from './modules/movimentacao/movimentacao.module';
 
 @Module({
   imports: [
@@ -29,7 +29,7 @@ import { MovimentacaoModule } from './modules/movimentacao/movimentacao.module';
     UserModule,
     AuthModule,
     ProdutosModule,
-    MovimentacaoModule,
+    // MovimentacaoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
