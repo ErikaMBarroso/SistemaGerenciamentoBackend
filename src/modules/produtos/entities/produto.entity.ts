@@ -1,5 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Categoria } from "../../categoria/entities/categoria.enity";
 @Entity('produtos')
 
 export class Produto{
@@ -23,5 +23,15 @@ export class Produto{
 
     @Column({name: 'quantidade_min', default: 5})
     quantidadeMin!: number;
+
+    @ManyToOne(() => Categoria, (categoria) => categoria.produtos)
+    @JoinColumn({ name: 'categoria_id'})
+    categoria!: Categoria;
+
+
+
+    @Column()
+    categoriaId!: number;
+
 
 }

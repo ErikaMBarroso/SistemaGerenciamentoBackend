@@ -10,6 +10,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ProdutosModule } from './modules/produtos/produtos.module';
 import { DatabaseModule } from './database/databaseModule';
 // import { MovimentacaoModule } from './modules/movimentacao/movimentacao.module';
+import { CategoriaModule } from './modules/categoria/categoria.module';
+
 
 @Module({
   imports: [
@@ -21,6 +23,7 @@ import { DatabaseModule } from './database/databaseModule';
     UserModule,
     AuthModule,
     ProdutosModule,
+    CategoriaModule,
     // MovimentacaoModule,
   ],
   controllers: [AppController],
