@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProdutosModule } from './modules/produtos/produtos.module';
+import { DatabaseModule } from './database/databaseModule';
 // import { MovimentacaoModule } from './modules/movimentacao/movimentacao.module';
 
 @Module({
@@ -16,16 +17,7 @@ import { ProdutosModule } from './modules/produtos/produtos.module';
       isGlobal: true,
     }),
 
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_HOST),
-      username: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      autoLoadEntities: true,
-      synchronize: false,
-    }),
+    DatabaseModule,
     UserModule,
     AuthModule,
     ProdutosModule,

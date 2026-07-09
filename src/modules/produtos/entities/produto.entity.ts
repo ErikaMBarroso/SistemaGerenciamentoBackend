@@ -9,7 +9,7 @@ export class Produto{
     @Column({ length: 100})
     nome!: string;
 
-    @Column()
+    @Column({type: 'text'})
     descricao!: string;
 
     @Column({ length: 100})
