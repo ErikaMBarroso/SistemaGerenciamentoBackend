@@ -21,7 +21,6 @@ export class CategoriaService {
             return await this.categoriaRepository.save(categoria);
         }
         catch(error){
-            console.error('Erro ao criar categoria:', error);
             if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('erro ao criar categoria')
         }
@@ -46,7 +45,7 @@ export class CategoriaService {
             return categoria;
         } catch(error){
             if (error instanceof HttpException) throw error;
-                throw new InternalServerErrorException('Erro ao buscar produtos');
+                throw new InternalServerErrorException('Erro ao buscar categoria');
     
         }
         }
