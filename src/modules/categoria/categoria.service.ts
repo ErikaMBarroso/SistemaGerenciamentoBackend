@@ -1,6 +1,6 @@
 import { ConflictException, HttpException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Categoria } from './entities/categoria.enity';
+import { Categoria } from './entities/categoria.entity';
 import { Repository } from 'typeorm';
 import { CriaCategoria } from './dto/criaCategoria.dto';
 import { AtualizaCategoria } from './dto/atualizaCategoria.dto';
@@ -29,7 +29,11 @@ export class CategoriaService {
 
     async consultaCategoria(): Promise<Categoria[]>{
         try{
-            return this.categoriaRepository.find();
+            return  await this.categoriaRepository.find({
+                order: { nome: 'ASC'}
+            });
+
+            
         }catch(error){
             if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('erro ao consulta categoria')
@@ -38,7 +42,8 @@ export class CategoriaService {
 
     async consultaUnicaCategoria(id: number): Promise<Categoria> {
             try{
-            const categoria = await this.categoriaRepository.findOne({ where: { categoriaId: id }, });
+            const categoria = await this.categoriaRepository.findOne({ 
+                where: { categoriaId: id }, relations: { produtos: true}, });
             if (!categoria){
                 throw new NotFoundException("Categoria não encontrado")
             }
@@ -56,6 +61,8 @@ export class CategoriaService {
 
             if(dto.nome && dto.nome !== categoria.nome){
                 const duplicado = await this.categoriaRepository.findOne({where: { nome:dto.nome}});
+
+
                 if(duplicado){
                     throw new ConflictException('Já existe categoria com esse nome ')
                 }

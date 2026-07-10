@@ -1,5 +1,7 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Categoria } from "../../categoria/entities/categoria.enity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Categoria } from "../../categoria/entities/categoria.entity";
+import { Exclude } from "class-transformer";
+// import { MovimentacaoEstoque } from "src/modules/movimentacao/entities/movimentacao.entity";
 @Entity('produtos')
 
 export class Produto{
@@ -28,10 +30,12 @@ export class Produto{
     @JoinColumn({ name: 'categoria_id'})
     categoria!: Categoria;
 
-
-
+    @Exclude()
     @Column({  name: 'categoria_id'})
     categoriaId!: number;
+
+    // @OneToMany(() => MovimentacaoEstoque, (movimentacao) => movimentacao.produto)
+    // movimentacao!: MovimentacaoEstoque[];
 
 
 }

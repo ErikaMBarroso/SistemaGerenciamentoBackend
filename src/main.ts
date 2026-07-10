@@ -1,6 +1,6 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -11,6 +11,8 @@ async function bootstrap() {
     transform: true,
   }));
 
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  
   const config = new DocumentBuilder()
   .setTitle('Sistema de Gerenciamento para Pet Shop')
   .setDescription('O Sistema de Gerenciamento para Pet Shop é uma aplicação web desenvolvida para centralizar e facilitar o gerenciamento das operações de um pet shop')

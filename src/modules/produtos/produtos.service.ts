@@ -4,12 +4,16 @@ import { Produto } from './entities/produto.entity';
 import { Repository } from 'typeorm';
 import { CriaProduto } from './dto/criaProduto.dto';
 import { AtualizaProduto } from './dto/atualizaProduto.dto';
+import { Categoria } from '../categoria/entities/categoria.entity';
 
 @Injectable()
 export class ProdutosService {
     constructor(
         @InjectRepository(Produto)
-        private produtoRepository: Repository<Produto>
+        private produtoRepository: Repository<Produto>,
+
+        @InjectRepository(Categoria)
+        private categoriaRepository:Repository<Categoria>
     ){}
 
     async criar(dto: CriaProduto): Promise<Produto>{
@@ -17,6 +21,14 @@ export class ProdutosService {
         const existe = await this.produtoRepository.findOne({where: {nome: dto.nome}})
         if (existe){
             throw new ConflictException('Produto já cadastrado');
+        }
+
+        const categoria = await this.categoriaRepository.findOne({
+            where: { categoriaId: dto.categoriaId},
+        });
+
+        if (!categoria){
+            throw new NotFoundException("Categoria não encontrada")
         }
         
             const produto = this.produtoRepository.create(dto);
@@ -30,7 +42,11 @@ export class ProdutosService {
 
     async consultaTodos(): Promise<Produto[]> {
         try{
-        return this.produtoRepository.find();
+           return await this.produtoRepository.find({
+               relations: { "categoria": true},
+               order: {nome: 'ASC'},
+
+           });
         } catch(error){
             if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('Erro ao buscar produtos');
@@ -39,7 +55,9 @@ export class ProdutosService {
 
     async consultaUnica(id: number): Promise<Produto> {
         try{
-        const produto = await this.produtoRepository.findOne({ where: { produtoID: id }, });
+        const produto = await this.produtoRepository.findOne({ 
+            where: { produtoID: id }, relations: {'categoria': true} });
+
         if (!produto){
             throw new NotFoundException("Produto não encontrado")
         }
@@ -59,6 +77,15 @@ export class ProdutosService {
                 const duplicado = await this.produtoRepository.findOne({where: { nome: dto.nome}});
                 if (duplicado){
                     throw new ConflictException('Já existe um produto com esse nome');
+                }
+            }
+
+            if(dto.categoriaId){
+                const categoria = await this.categoriaRepository.findOne({
+                    where: {categoriaId: dto.categoriaId}
+                });
+                if (!categoria){
+                    throw new NotFoundException('Categoria não encontrada')
                 }
             }
 
