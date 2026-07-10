@@ -30,7 +30,7 @@ export class Produto{
 
 
 
-    @Column()
+    @Column({  name: 'categoria_id'})
     categoriaId!: number;
 
 

@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsInt, IsNumber, IsOptional, IsString, MaxLength, Min, MinLength } from "class-validator";
+import { IsInt, IsNumber, IsOptional, IsPositive, IsString, MaxLength, Min, MinLength } from "class-validator";
 
 export class CriaProduto{
 
@@ -33,5 +33,7 @@ export class CriaProduto{
     @Min(0)
     quantidadeMin!: number;
 
-
+    @IsInt()
+    @IsPositive()
+    categoriaId!: number;
 }
