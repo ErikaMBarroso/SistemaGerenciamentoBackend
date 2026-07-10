@@ -1,4 +1,4 @@
-import { ConflictException, HttpException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Categoria } from './entities/categoria.entity';
 import { Repository } from 'typeorm';
@@ -82,8 +82,14 @@ export class CategoriaService {
 
             const categoria = await this.consultaUnicaCategoria(id);
 
-            await this.categoriaRepository.remove(categoria);
+            if (categoria.produtos && categoria.produtos.length > 0){
+                throw new BadRequestException(
+                     `Categoria possui ${categoria.produtos.length} produto vinculado e não pode ser apagada`
+                );
+            }
 
+            await this.categoriaRepository.remove(categoria);
+            
             return { mensagem: 'categoria removida'}
         }
         catch(error){
