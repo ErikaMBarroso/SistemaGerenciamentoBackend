@@ -56,7 +56,7 @@ export class ProdutosService {
     async consultaUnica(id: number): Promise<Produto> {
         try{
         const produto = await this.produtoRepository.findOne({ 
-            where: { produtoID: id }, relations: {'categoria': true} });
+            where: { produtoId: id }, relations: {'categoria': true} });
 
         if (!produto){
             throw new NotFoundException("Produto não encontrado")

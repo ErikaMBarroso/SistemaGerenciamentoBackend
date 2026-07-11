@@ -6,7 +6,7 @@ import { MovimentacaoEstoque } from "src/modules/movimentacao/entities/movimenta
 
 export class Produto{
     @PrimaryGeneratedColumn({name: 'produto_id'})
-    produtoID!: number;
+    produtoId!: number;
 
     @Column({ length: 100})
     nome!: string;
