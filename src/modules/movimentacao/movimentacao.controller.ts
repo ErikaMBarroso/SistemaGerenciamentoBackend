@@ -1,4 +1,4 @@
-// import { Controller } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 
-// @Controller('movimentacao')
-// export class MovimentacaoController {}
+@Controller('movimentacao')
+export class MovimentacaoController {}

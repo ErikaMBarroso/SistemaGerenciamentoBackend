@@ -9,7 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProdutosModule } from './modules/produtos/produtos.module';
 import { DatabaseModule } from './database/databaseModule';
-// import { MovimentacaoModule } from './modules/movimentacao/movimentacao.module';
+import { MovimentacaoModule } from './modules/movimentacao/movimentacao.module';
 import { CategoriaModule } from './modules/categoria/categoria.module';
 
 
@@ -24,7 +24,7 @@ import { CategoriaModule } from './modules/categoria/categoria.module';
     AuthModule,
     ProdutosModule,
     CategoriaModule,
-    // MovimentacaoModule,
+    MovimentacaoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

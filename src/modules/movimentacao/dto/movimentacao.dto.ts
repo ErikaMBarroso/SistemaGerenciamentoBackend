@@ -1,14 +1,14 @@
-// import { IsDate, IsEnum, IsInt, Min } from "class-validator";
+import { IsDate, IsEnum, IsInt, Min } from "class-validator";
 
-// export class MovimentacaoDto{
-//     @IsEnum(['entrada', 'saida'])
-//     tipo!: 'entrada' | 'saida';
+export class MovimentacaoDto{
+    @IsEnum(['entrada', 'saida'])
+    tipo!: 'entrada' | 'saida';
 
-//     @IsInt()
-//     @Min(1)
-//     quantidade!: number;
+    @IsInt()
+    @Min(1)
+    quantidade!: number;
 
-//     @IsDate()
-//     dataMovimentacao!: string;
+    @IsDate()
+    dataMovimentacao!: string;
 
-// }
+}

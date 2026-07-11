@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Categoria } from "../../categoria/entities/categoria.entity";
 import { Exclude } from "class-transformer";
-// import { MovimentacaoEstoque } from "src/modules/movimentacao/entities/movimentacao.entity";
+import { MovimentacaoEstoque } from "src/modules/movimentacao/entities/movimentacao.entity";
 @Entity('produtos')
 
 export class Produto{
@@ -34,8 +34,8 @@ export class Produto{
     @Column({  name: 'categoria_id'})
     categoriaId!: number;
 
-    // @OneToMany(() => MovimentacaoEstoque, (movimentacao) => movimentacao.produto)
-    // movimentacao!: MovimentacaoEstoque[];
+    @OneToMany(() => MovimentacaoEstoque, (movimentacao) => movimentacao.produto)
+    movimentacao!: MovimentacaoEstoque[];
 
 
 }
