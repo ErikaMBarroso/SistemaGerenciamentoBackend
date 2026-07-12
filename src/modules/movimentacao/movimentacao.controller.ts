@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Request } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Request } from '@nestjs/common';
 import { MovimentacaoService } from './movimentacao.service';
 import { MovimentacaoDto } from './dto/movimentacao.dto';
 
@@ -10,5 +10,15 @@ export class MovimentacaoController {
     criar(@Body() dto: MovimentacaoDto, @Request() req: any){
         return this.movimentacaoService.criaMovimentacao(dto, req.user.usuarioId);
         
+    }
+
+    @Get()
+    historicoMovimentacao(){
+        return this.movimentacaoService.historicoMovimentacao();
+    }
+
+    @Get(':produtoId')
+    consultaMovimentacaoIndividual(@Param('produtoId', ParseIntPipe) produtoId: number){
+        return this.movimentacaoService.consultaMovimentacaoIndividual(produtoId);
     }
 }

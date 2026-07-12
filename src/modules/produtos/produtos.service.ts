@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CriaProduto } from './dto/criaProduto.dto';
 import { AtualizaProduto } from './dto/atualizaProduto.dto';
 import { Categoria } from '../categoria/entities/categoria.entity';
+import { MovimentacaoEstoque } from '../movimentacao/entities/movimentacao.entity';
 
 @Injectable()
 export class ProdutosService {
@@ -13,12 +14,17 @@ export class ProdutosService {
         private produtoRepository: Repository<Produto>,
 
         @InjectRepository(Categoria)
-        private categoriaRepository:Repository<Categoria>
+        private categoriaRepository: Repository<Categoria>,
+
+        @InjectRepository(MovimentacaoEstoque)
+        private movimentacaoRepository: Repository<MovimentacaoEstoque>,
     ){}
 
     async criar(dto: CriaProduto): Promise<Produto>{
         try{
-        const existe = await this.produtoRepository.findOne({where: {nome: dto.nome}})
+
+        const existe = await this.produtoRepository.findOne({where: {nome: dto.nome, marca: dto.marca,}})
+        
         if (existe){
             throw new ConflictException('Produto já cadastrado');
         }
@@ -101,6 +107,14 @@ export class ProdutosService {
     async deleta(id: number):  Promise<{mensagem: string}>{
         try{
             const produto = await this.consultaUnica(id);
+            
+            const totalMovimentacoes = await this.movimentacaoRepository.count({
+                where: { produtoId: id },
+            });
+
+            if(totalMovimentacoes > 0) {
+                throw new ConflictException( 'Não é possivel remover: este produto está em movimentação');
+            }
 
             await this.produtoRepository.remove(produto);
         

@@ -56,4 +56,49 @@ export class MovimentacaoService {
         }
         
     }
+
+    async consultaMovimentacaoTotal(): Promise<MovimentacaoEstoque[]>{
+        try{ const resultado = this.movimentacaoRepository.createQueryBuilder('m')
+            .select('m.tipo', 'tipo')
+            .addSelect('SUM(m.quantidade)', 'total')
+            .groupBy('m.tipo')
+            .getRawMany();
+
+
+            return resultado;
+
+        }catch(error){
+            if (error instanceof HttpException) throw error;
+            throw new InternalServerErrorException('Erro ao buscar movimentacao');
+        }
+    }
+
+    async consultaMovimentacaoIndividual(produtoId: number): Promise<MovimentacaoEstoque[]>{
+        try{ return await this.movimentacaoRepository.find({
+            where: {produtoId},
+            relations: {'usuario': true},
+            order: {quantidade: 'ASC'},
+        });
+
+        }catch(error){
+            if (error instanceof HttpException) throw error;
+            throw new InternalServerErrorException('Erro ao buscar movimentacao');
+        }
+    }
+
+
+
+
+    async historicoMovimentacao(): Promise<MovimentacaoEstoque[]>{
+        try{
+            return  await this.movimentacaoRepository.find({
+                relations: {usuario: true, produto: true},
+                order: {dataMovimentacao: 'DESC'},
+            });
+
+        }catch (error) {
+            if (error instanceof HttpException) throw error;
+            throw new InternalServerErrorException('Erro ao buscar histórico de movimentação');
+        }
+    }
 }
