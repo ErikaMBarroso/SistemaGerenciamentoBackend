@@ -58,7 +58,7 @@ export class MovimentacaoService {
     }
 
     async consultaMovimentacaoTotal(): Promise<MovimentacaoEstoque[]>{
-        try{ const resultado = this.movimentacaoRepository.createQueryBuilder('m')
+        try{ const resultado = await this.movimentacaoRepository.createQueryBuilder('m')
             .select('m.tipo', 'tipo')
             .addSelect('SUM(m.quantidade)', 'total')
             .groupBy('m.tipo')
@@ -77,7 +77,7 @@ export class MovimentacaoService {
         try{ return await this.movimentacaoRepository.find({
             where: {produtoId},
             relations: {'usuario': true},
-            order: {quantidade: 'ASC'},
+            order: {dataMovimentacao: 'ASC'},
         });
 
         }catch(error){

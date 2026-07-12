@@ -17,6 +17,11 @@ export class MovimentacaoController {
         return this.movimentacaoService.historicoMovimentacao();
     }
 
+    @Get('total')
+    consultaMovimentacaoTotal(){
+        return this.movimentacaoService.consultaMovimentacaoTotal()
+    }
+
     @Get(':produtoId')
     consultaMovimentacaoIndividual(@Param('produtoId', ParseIntPipe) produtoId: number){
         return this.movimentacaoService.consultaMovimentacaoIndividual(produtoId);
