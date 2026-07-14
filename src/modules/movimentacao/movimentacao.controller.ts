@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, Request, UseGuards } from '@nestjs/common';
 import { MovimentacaoService } from './movimentacao.service';
 import { MovimentacaoDto } from './dto/movimentacao.dto';
 import { JwtAuthGuard } from '../auth/auth.guard';
@@ -39,9 +39,24 @@ export class MovimentacaoController {
         return this.movimentacaoService.consultaMovimentacaoTotal()
     }
 
+    
+    @Get('estoqueBaixo')
+    @UseGuards(JwtAuthGuard)
+    estoqueBaixo(){
+        return this.movimentacaoService.estoqueBaixo();
+    }
+
+    @Get('semMovimentacao')
+    @UseGuards(JwtAuthGuard)
+    semMovimentacao(@Query('dias') dias?: string){
+        return this.movimentacaoService.semMovimentacao(dias ? Number(dias): 30)
+    }
+
     @Get(':produtoId')
     @UseGuards(JwtAuthGuard)
     consultaMovimentacaoIndividual(@Param('produtoId', ParseIntPipe) produtoId: number){
         return this.movimentacaoService.consultaMovimentacaoIndividual(produtoId);
     }
+
+
 }

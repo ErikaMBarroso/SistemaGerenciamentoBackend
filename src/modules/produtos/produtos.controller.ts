@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Request, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/role.guard';
 import { ProdutosService } from './produtos.service';
@@ -18,8 +18,8 @@ export class ProdutosController {
 @Post()
 @ApiOperation({ summary:'Cadastra Produto' })
 @Perfis('administrador')
-    criar(@Body() dto: CriaProduto){
-        return this.produtoService.criar(dto);
+    criar(@Body() dto: CriaProduto, @Request() req: any){
+        return this.produtoService.criar(dto, req.user.usuarioId);
     }
 
 @Get()

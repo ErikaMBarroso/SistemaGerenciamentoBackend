@@ -8,8 +8,8 @@ export class MovimentacaoDto{
     @Min(1)
     quantidade!: number;
 
-    @IsDateString()
-    dataMovimentacao!: string;
+    // @IsDateString()
+    // dataMovimentacao!: string;
 
     @IsInt()
     produtoId!: number;

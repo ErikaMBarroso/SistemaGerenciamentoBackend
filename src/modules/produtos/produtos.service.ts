@@ -20,7 +20,7 @@ export class ProdutosService {
         private movimentacaoRepository: Repository<MovimentacaoEstoque>,
     ){}
 
-    async criar(dto: CriaProduto): Promise<Produto>{
+    async criar(dto: CriaProduto, usuarioId: number): Promise<Produto>{
         try{
 
         const existe = await this.produtoRepository.findOne({where: {nome: dto.nome, marca: dto.marca,}})
@@ -36,9 +36,28 @@ export class ProdutosService {
         if (!categoria){
             throw new NotFoundException("Categoria não encontrada")
         }
+const produtoCriado  = await this.produtoRepository.manager.transaction(async(manager) => {
+            const produto = manager.create(Produto, dto);
+            const produtoSalvo = await manager.save(produto);
+
+            if (dto.quantidade > 0){
+                const movimentacaoInicial = manager.create(MovimentacaoEstoque, {
+                    tipo: 'entrada',
+                    quantidade: dto.quantidade,
+                    dataMovimentacao: new Date(),
+                    produtoId: produtoSalvo.produtoId,
+                    usuarioId,
+                });
+                await manager.save(movimentacaoInicial)
+
+            }
+            
         
-            const produto = this.produtoRepository.create(dto);
-            return await this.produtoRepository.save(produto);
+          return produtoSalvo;
+        });
+        return produtoCriado 
+        
+        
     }
          catch (error) {
             if (error instanceof HttpException) throw error;

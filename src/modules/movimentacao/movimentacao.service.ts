@@ -44,7 +44,7 @@ export class MovimentacaoService {
             const movimentacao = this.movimentacaoRepository.create({
                 tipo: dto.tipo,
                 quantidade: dto.quantidade,
-                dataMovimentacao: dto.dataMovimentacao,
+                dataMovimentacao:  new Date(),
                 produtoId: dto.produtoId,
                 usuarioId,
             });
@@ -147,6 +147,42 @@ export class MovimentacaoService {
         }
     }
 
+    async estoqueBaixo(): Promise<Produto[]>{
+        try{
+            const baixo = await this.produtoRepository
+            .createQueryBuilder('q')
+            .where('q.quantidade <= q.quantidadeMin')
+            .orderBy('q.quantidade', 'ASC')
+            .getMany();
+            return baixo;
+
+        }catch (error) {
+            console.error(error)
+            if (error instanceof HttpException) throw error;
+            throw new InternalServerErrorException('Erro ao buscar estoque baixo');
+        }
+    
+    }
+    async semMovimentacao(dias: number): Promise<Produto[]>{
+        try{
+            const dataLimite = new Date();
+            dataLimite.setDate(dataLimite.getDate() - dias);
+
+            const sem = await this.movimentacaoRepository.manager.createQueryBuilder(Produto, 'p')
+            .leftJoin('p.movimentacao', 'mov')
+            .groupBy('p.produtoId')
+            .having('MAX(mov.dataMovimentacao) < :dataLimite', {dataLimite})
+            .orHaving('MAX(mov.dataMovimentacao) IS NULL')
+            .getMany();
+
+            return sem
+
+        }catch (error) {
+            console.error(error)
+            if (error instanceof HttpException) throw error;
+            throw new InternalServerErrorException('Erro ao buscar produto sem movimentação');
+        }
+    }
 
 
 }
