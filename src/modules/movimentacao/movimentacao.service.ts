@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MovimentacaoEstoque } from './entities/movimentacao.entity';
 import { Repository } from 'typeorm';
 import { Produto } from '../produtos/entities/produto.entity';
+import {TotalPorTipo} from './interface/interfaceTipo'
 import { MovimentacaoDto } from './dto/movimentacao.dto';
 @Injectable()
 export class MovimentacaoService {
@@ -57,7 +58,7 @@ export class MovimentacaoService {
         
     }
 
-    async consultaMovimentacaoTotal(): Promise<MovimentacaoEstoque[]>{
+    async consultaMovimentacaoTotal(): Promise<TotalPorTipo[]>{
         try{ const resultado = await this.movimentacaoRepository.createQueryBuilder('m')
             .select('m.tipo', 'tipo')
             .addSelect('SUM(m.quantidade)', 'total')
@@ -77,6 +78,16 @@ export class MovimentacaoService {
         try{ return await this.movimentacaoRepository.find({
             where: {produtoId},
             relations: {'usuario': true},
+            select:{ id: true,
+                tipo: true,
+                quantidade: true,
+                dataMovimentacao: true,
+                produtoId: true,
+                usuario: {
+                    perfil: true,
+                },
+
+            },
             order: {dataMovimentacao: 'ASC'},
         });
 
@@ -93,6 +104,16 @@ export class MovimentacaoService {
         try{
             return  await this.movimentacaoRepository.find({
                 relations: {usuario: true, produto: true},
+                select:{ id: true,
+                tipo: true,
+                quantidade: true,
+                dataMovimentacao: true,
+                produtoId: true,
+                usuario: {
+                    perfil: true,
+                },
+
+            },
                 order: {dataMovimentacao: 'DESC'},
             });
 
