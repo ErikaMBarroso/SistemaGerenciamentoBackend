@@ -17,20 +17,26 @@ export class MovimentacaoController {
 
     @Get()
     @UseGuards(JwtAuthGuard)
-    historicoMovimentacao(){
-        return this.movimentacaoService.historicoMovimentacao();
+    consultaMovimentacao(){
+        return this.movimentacaoService.consultaMovimentacao()
     }
 
-    @Get('total')
+    @Get('historico')
     @UseGuards(JwtAuthGuard)
-    consultaMovimentacaoTotal(){
-        return this.movimentacaoService.consultaMovimentacaoTotal()
+    historicoMovimentacao(){
+        return this.movimentacaoService.historicoMovimentacao();
     }
 
     @Get('produtoTotal')
     @UseGuards(JwtAuthGuard)
     estoqueQuantidadeAtual(){
         return this.movimentacaoService.estoqueQuantidadeAtual()
+    }
+
+    @Get('total')
+    @UseGuards(JwtAuthGuard)
+    consultaMovimentacaoTotal(){
+        return this.movimentacaoService.consultaMovimentacaoTotal()
     }
 
     @Get(':produtoId')

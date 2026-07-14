@@ -59,11 +59,13 @@ export class MovimentacaoService {
         
     }
 
-    async consultaMovimentacaoTotal(): Promise<TotalPorTipo[]>{
+    async consultaMovimentacao(): Promise<TotalPorTipo[]>{
         try{ const resultado = await this.movimentacaoRepository.createQueryBuilder('m')
-            .select('m.tipo', 'tipo')
-            .addSelect('SUM(m.quantidade)', 'total')
-            .groupBy('m.tipo')
+            .leftJoin('m.produto', 'p')
+            .select('p.nome', 'nome')
+            .addSelect('m.tipo', 'tipo')
+            .addSelect('m.quantidade', 'total')
+            .orderBy('m.dataMovimentacao', 'DESC')
             .getRawMany();
             return resultado;
 
@@ -105,13 +107,21 @@ export class MovimentacaoService {
             return produto;
             
         } catch(error){
-            console.error(error);
             if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('Erro ao buscar produto');
         }
     }
+    async consultaMovimentacaoTotal(): Promise<TotalPorTipo[]>{ 
+        try{ const resultado = await this.movimentacaoRepository.createQueryBuilder('m') 
 
+            .select('m.tipo', 'tipo') 
+            .addSelect('SUM(m.quantidade)', 'total') 
+            .groupBy('m.tipo') .getRawMany(); 
+            return resultado; 
 
+        }catch(error){ 
+        if (error instanceof HttpException) 
+            throw error; throw new InternalServerErrorException('Erro ao buscar toral'); }}
 
 
     async historicoMovimentacao(): Promise<MovimentacaoEstoque[]>{
@@ -136,6 +146,7 @@ export class MovimentacaoService {
             throw new InternalServerErrorException('Erro ao buscar histórico de movimentação');
         }
     }
+
 
 
 }
