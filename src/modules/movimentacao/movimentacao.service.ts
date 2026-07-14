@@ -3,7 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MovimentacaoEstoque } from './entities/movimentacao.entity';
 import { Repository } from 'typeorm';
 import { Produto } from '../produtos/entities/produto.entity';
-import {TotalPorTipo} from './interface/interfaceTipo'
+import {TotalPorTipo} from './interface/interfaceTipo';
+import { TotalPorNome } from './interface/interfaceNome';
 import { MovimentacaoDto } from './dto/movimentacao.dto';
 @Injectable()
 export class MovimentacaoService {
@@ -64,8 +65,6 @@ export class MovimentacaoService {
             .addSelect('SUM(m.quantidade)', 'total')
             .groupBy('m.tipo')
             .getRawMany();
-
-
             return resultado;
 
         }catch(error){
@@ -97,6 +96,21 @@ export class MovimentacaoService {
         }
     }
 
+        async estoqueQuantidadeAtual(): Promise <TotalPorNome[]>{
+        try{
+            const produto = await this.produtoRepository.createQueryBuilder('p')
+            .select('p.nome','nome')
+            .addSelect('p.quantidade', 'total')
+            .getRawMany();
+            return produto;
+            
+        } catch(error){
+            console.error(error);
+            if (error instanceof HttpException) throw error;
+            throw new InternalServerErrorException('Erro ao buscar produto');
+        }
+    }
+
 
 
 
@@ -122,4 +136,6 @@ export class MovimentacaoService {
             throw new InternalServerErrorException('Erro ao buscar histórico de movimentação');
         }
     }
+
+
 }

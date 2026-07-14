@@ -27,6 +27,12 @@ export class MovimentacaoController {
         return this.movimentacaoService.consultaMovimentacaoTotal()
     }
 
+    @Get('produtoTotal')
+    @UseGuards(JwtAuthGuard)
+    estoqueQuantidadeAtual(){
+        return this.movimentacaoService.estoqueQuantidadeAtual()
+    }
+
     @Get(':produtoId')
     @UseGuards(JwtAuthGuard)
     consultaMovimentacaoIndividual(@Param('produtoId', ParseIntPipe) produtoId: number){
