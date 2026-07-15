@@ -53,6 +53,7 @@ export class MovimentacaoService {
         
         }
         catch(error){
+            console.error(error);
             if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('Erro ao registrar movimentação');
         }

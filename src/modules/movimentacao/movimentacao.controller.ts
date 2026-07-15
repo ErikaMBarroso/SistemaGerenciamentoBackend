@@ -3,6 +3,7 @@ import { MovimentacaoService } from './movimentacao.service';
 import { MovimentacaoDto } from './dto/movimentacao.dto';
 import { JwtAuthGuard } from '../auth/auth.guard';
 import { ApiOperation } from '@nestjs/swagger';
+import { UsuarioLogado } from 'src/common/decorators/usuarioLogado.decorators';
 
 @Controller('movimentacao')
 export class MovimentacaoController {
@@ -11,9 +12,9 @@ export class MovimentacaoController {
     @Post()
     @ApiOperation({ summary:'Cria Movimentação de Entrada ou Saída' })
     @UseGuards(JwtAuthGuard)
-    criar(@Body() dto: MovimentacaoDto, @Request() req: any){
-        console.log(req.user);
-        return this.movimentacaoService.criaMovimentacao(dto, req.user.usuarioId);
+    criar(@Body() dto: MovimentacaoDto, @UsuarioLogado() usuarioLogado: {usuarioId: number; nome: string; perfil: string}){
+        // console.log('Usuário logado:', usuarioLogado);
+        return this.movimentacaoService.criaMovimentacao(dto, usuarioLogado.usuarioId);
         
     }
 

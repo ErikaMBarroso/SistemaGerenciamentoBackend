@@ -6,6 +6,7 @@ import { Perfis } from '../auth/auth.decorator';
 import { CriaProduto } from './dto/criaProduto.dto';
 import { AtualizaProduto } from './dto/atualizaProduto.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UsuarioLogado } from 'src/common/decorators/usuarioLogado.decorators';
 
 @ApiTags('produto')
 @ApiBearerAuth()
@@ -18,8 +19,8 @@ export class ProdutosController {
 @Post()
 @ApiOperation({ summary:'Cadastra Produto' })
 @Perfis('administrador')
-    criar(@Body() dto: CriaProduto, @Request() req: any){
-        return this.produtoService.criar(dto, req.user.usuarioId);
+    criar(@Body() dto: CriaProduto, @UsuarioLogado() UsuarioLogado: any){
+        return this.produtoService.criar(dto, UsuarioLogado.usuarioId);
     }
 
 @Get()
@@ -51,9 +52,8 @@ atualizar(
 @Delete(':id')
 @ApiOperation({ summary:'Apaga o produto' })
 @Perfis('administrador')
-deleta(@Param('id', ParseIntPipe) id: number, @Request() req: any){
-    const usuarioId = (req.user as any).sub;
-    return this.produtoService.deleta(id, usuarioId);
+deleta(@Param('id', ParseIntPipe) id: number, @UsuarioLogado() UsuarioLogado: any){
+    return this.produtoService.deleta(id, UsuarioLogado);
 }
 
 }
