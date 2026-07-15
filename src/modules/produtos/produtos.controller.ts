@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Req, Request, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/role.guard';
 import { ProdutosService } from './produtos.service';
@@ -51,8 +51,9 @@ atualizar(
 @Delete(':id')
 @ApiOperation({ summary:'Apaga o produto' })
 @Perfis('administrador')
-deleta(@Param('id', ParseIntPipe) id: number){
-    return this.produtoService.deleta(id);
+deleta(@Param('id', ParseIntPipe) id: number, @Request() req: any){
+    const usuarioId = (req.user as any).sub;
+    return this.produtoService.deleta(id, usuarioId);
 }
 
 }

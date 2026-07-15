@@ -36,7 +36,8 @@ export class ProdutosService {
         if (!categoria){
             throw new NotFoundException("Categoria não encontrada")
         }
-const produtoCriado  = await this.produtoRepository.manager.transaction(async(manager) => {
+
+            const produtoCriado  = await this.produtoRepository.manager.transaction(async(manager) => {
             const produto = manager.create(Produto, dto);
             const produtoSalvo = await manager.save(produto);
 
@@ -123,21 +124,41 @@ const produtoCriado  = await this.produtoRepository.manager.transaction(async(ma
     }
 
 
-    async deleta(id: number):  Promise<{mensagem: string}>{
-        try{
-            const produto = await this.consultaUnica(id);
-            
-            const totalMovimentacoes = await this.movimentacaoRepository.count({
-                where: { produtoId: id },
+    async deleta(id: number, usuarioId: number):  Promise<{mensagem: string}>{
+        try{ 
+            return await this.produtoRepository.manager.transaction(async (manager) => {
+                const produto = await this.consultaUnica(id);
+
+                if (produto.quantidade > 0){
+                    const movimentcaoSaida = manager.create(MovimentacaoEstoque, {
+                        tipo: 'saida',
+                        quantidade: produto.quantidade,
+                        dataMovimentacao: new Date(),
+                        produtoId: produto.produtoId,
+                        usuarioId,
+                    });
+                    await manager.save(movimentcaoSaida);
+
+                    produto.quantidade = 0;
+                    await manager.save(produto);
+                }
+
+                const totalMovimentacoes = await manager.count(MovimentacaoEstoque,{
+                    where: {produtoId: id},
+
+                });
+
+                if (totalMovimentacoes > 0){
+                    return { mensagem: 'O estoque foi zerado' };
+                }
+
+                await manager.remove(produto);
+                return { mensagem: 'Produto removido com sucesso' };
+
+
             });
 
-            if(totalMovimentacoes > 0) {
-                throw new ConflictException( 'Não é possivel remover: este produto está em movimentação');
-            }
-
-            await this.produtoRepository.remove(produto);
-        
-            return{ mensagem: 'produto removido'};
+            
     } catch (error) {
             if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('Erro ao remover produto');
