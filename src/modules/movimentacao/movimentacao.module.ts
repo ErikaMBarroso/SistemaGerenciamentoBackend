@@ -4,6 +4,7 @@ import { MovimentacaoService } from './movimentacao.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MovimentacaoEstoque } from './entities/movimentacao.entity';
 import { Produto } from '../produtos/entities/produto.entity';
+import { MovimentacaoRepository } from './movimentacao.repository';
 
 @Module({
   imports: [ TypeOrmModule.forFeature([
@@ -11,6 +12,6 @@ import { Produto } from '../produtos/entities/produto.entity';
     Produto,
   ]),],
   controllers: [MovimentacaoController],
-  providers: [MovimentacaoService]
+  providers: [MovimentacaoService,  MovimentacaoRepository]
 })
 export class MovimentacaoModule {}
