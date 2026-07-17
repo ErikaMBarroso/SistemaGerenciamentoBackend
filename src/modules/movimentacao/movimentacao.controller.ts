@@ -59,12 +59,12 @@ export class MovimentacaoController {
         return this.movimentacaoService.estoqueBaixo();
     }
 
-    // @Get('semMovimentacao')
-    // @ApiOperation({ summary:'Cadastra Produto' })
-    // @Perfis('administrador')
-    // semMovimentacao(@Query('dias') dias?: string){
-    //     return this.movimentacaoService.semMovimentacao(dias ? Number(dias): 30)
-    // }
+    @Get('semMovimentacao')
+    @ApiOperation({ summary:'Cadastra Produto' })
+    @Perfis('administrador')
+    semMovimentacao(@Query('dias') dias?: string){
+        return this.movimentacaoService.semMovimentacao(dias ? Number(dias): 30)
+    }
 
     @Get(':produtoId')
     @ApiOperation({ summary:'Cadastra Produto' })

@@ -7,21 +7,19 @@ import {TotalPorTipo} from './interface/interfaceTipo';
 import { TotalPorNome } from './interface/interfaceNome';
 import { MovimentacaoDto } from './dto/movimentacao.dto';
 import { MovimentacaoRepository } from './movimentacao.repository';
+import { ProdutoRepository } from '../produtos/produto.repository';
 @Injectable()
 export class MovimentacaoService {
     constructor(
 
         private readonly movimentacaoRepository: MovimentacaoRepository,
 
-        @InjectRepository(Produto)
-        private produtoRepository : Repository<Produto>,
+        private readonly produtoRepository: ProdutoRepository,
     ){}
 
     async criaMovimentacao(dto: MovimentacaoDto, usuarioId: number): Promise<MovimentacaoEstoque>{
         try{
-            const produto = await this.produtoRepository.findOne({
-                where: { produtoId: dto.produtoId},
-            });
+            const produto = await this.produtoRepository.achaPorId(dto.produtoId);
             if (!produto){
                 throw new NotFoundException('Produto não encontrado');
             }
@@ -42,7 +40,7 @@ export class MovimentacaoService {
             
             
 
-            await this.produtoRepository.save(produto);
+            await this.produtoRepository.salvar(produto);
 
             const movimentacao = this.movimentacaoRepository.criar({
                 tipo: dto.tipo,
@@ -86,12 +84,8 @@ export class MovimentacaoService {
 
         async estoqueQuantidadeAtual(): Promise <TotalPorNome[]>{
         try{
-            const produto = await this.produtoRepository.createQueryBuilder('p')
-            .where('p.ativo = true')
-            .select('p.nome','nome')
-            .addSelect('p.quantidade', 'total')
-            .getRawMany();
-            return produto;
+            return this.produtoRepository.estoqueQuantidadeAtual()
+            
             
         } catch(error){
             if (error instanceof HttpException) throw error;
@@ -121,13 +115,8 @@ export class MovimentacaoService {
 
     async estoqueBaixo(): Promise<Produto[]>{
         try{
-            const baixo = await this.produtoRepository
-            .createQueryBuilder('q')
-            .where('q.quantidade <= q.quantidadeMin')
-            .andWhere('q.ativo = true')
-            .orderBy('q.quantidade', 'ASC')
-            .getMany();
-            return baixo;
+            return  this.produtoRepository.estoqueBaixo()
+            
 
         }catch (error) {
             console.error(error)
@@ -136,27 +125,16 @@ export class MovimentacaoService {
         }
     
     }
-    // async semMovimentacao(dias: number): Promise<Produto[]>{
-    //     try{
-    //         const dataLimite = new Date();
-    //         dataLimite.setDate(dataLimite.getDate() - dias);
+    async semMovimentacao(dias: number): Promise<Produto[]>{
+        try{
+            return this.produtoRepository.semMovimentacao(dias);
 
-    //         const sem = await this.movimentacaoRepository.manager.createQueryBuilder(Produto, 'p')
-    //         .leftJoin('p.movimentacao', 'mov')
-    //         .where('p.ativo = true')
-    //         .groupBy('p.produtoId')
-    //         .having('MAX(mov.dataMovimentacao) < :dataLimite', {dataLimite})
-    //         .orHaving('MAX(mov.dataMovimentacao) IS NULL')
-    //         .getMany();
-
-    //         return sem
-
-    //     }catch (error) {
-    //         console.error(error)
-    //         if (error instanceof HttpException) throw error;
-    //         throw new InternalServerErrorException('Erro ao buscar produto sem movimentação');
-    //     }
-    // }
+        }catch (error) {
+            console.error(error)
+            if (error instanceof HttpException) throw error;
+            throw new InternalServerErrorException('Erro ao buscar produto sem movimentação');
+        }
+    }
 
 
 }
