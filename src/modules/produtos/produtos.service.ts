@@ -20,52 +20,7 @@ export class ProdutosService {
         private movimentacaoRepository: Repository<MovimentacaoEstoque>,
     ){}
 
-    // async criar(dto: CriaProduto, usuarioId: number): Promise<Produto>{
-    //     try{
-
-    //     const existe = await this.produtoRepository.findOne({where: {nome: dto.nome, marca: dto.marca,}})
-        
-    //     if (existe){
-    //         throw new ConflictException('Produto já cadastrado');
-    //     }
-
-    //     const categoria = await this.categoriaRepository.findOne({
-    //         where: { categoriaId: dto.categoriaId},
-    //     });
-
-    //     if (!categoria){
-    //         throw new NotFoundException("Categoria não encontrada")
-    //     }
-
-    //         const produtoCriado  = await this.produtoRepository.manager.transaction(async(manager) => {
-    //         const produto = manager.create(Produto, dto);
-    //         const produtoSalvo = await manager.save(produto);
-
-    //         if (dto.quantidade > 0){
-    //             const movimentacaoInicial = manager.create(MovimentacaoEstoque, {
-    //                 tipo: 'entrada',
-    //                 quantidade: dto.quantidade,
-    //                 dataMovimentacao: new Date(),
-    //                 produtoId: produtoSalvo.produtoId,
-    //                 usuarioId,
-    //             });
-    //             await manager.save(movimentacaoInicial)
-
-    //         }
-            
-        
-    //       return produtoSalvo;
-    //     });
-    //     return produtoCriado 
-        
-        
-    // }
-    //      catch (error) {
-    //         if (error instanceof HttpException) throw error;
-    //         throw new InternalServerErrorException('Erro ao criar produto');
-    //     }
-    // }
-    async criar(dto: CriaProduto): Promise<Produto>{
+    async criar(dto: CriaProduto, usuarioId: number): Promise<Produto>{
         try{
 
         const existe = await this.produtoRepository.findOne({where: {nome: dto.nome, marca: dto.marca,}})
@@ -82,18 +37,66 @@ export class ProdutosService {
             throw new NotFoundException("Categoria não encontrada")
         }
         
-            const produto = this.produtoRepository.create(dto);
-            return await this.produtoRepository.save(produto);
-        }
+
+            const produtoCriado  = await this.produtoRepository.manager.transaction(async(manager) => {
+            const produto = manager.create(Produto, dto);
+            const produtoSalvo = await manager.save(produto);
+
+            if (dto.quantidade > 0){
+                const movimentacaoInicial = manager.create(MovimentacaoEstoque, {
+                    tipo: 'entrada',
+                    quantidade: dto.quantidade,
+                    dataMovimentacao: new Date(),
+                    produtoId: produtoSalvo.produtoId,
+                    usuarioId,
+                });
+                await manager.save(movimentacaoInicial)
+
+            }
+            
+        
+          return produtoSalvo;
+        });
+        return produtoCriado 
+        
+        
+    }
          catch (error) {
+            console.log(error);
             if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('Erro ao criar produto');
         }
     }
+    // async criar(dto: CriaProduto): Promise<Produto>{
+    //     try{
+
+    //     const existe = await this.produtoRepository.findOne({where: {nome: dto.nome, marca: dto.marca,}})
+        
+    //     if (existe){
+    //         throw new ConflictException('Produto já cadastrado');
+    //     }
+
+    //     const categoria = await this.categoriaRepository.findOne({
+    //         where: { categoriaId: dto.categoriaId},
+    //     });
+
+    //     if (!categoria){
+    //         throw new NotFoundException("Categoria não encontrada")
+    //     }
+        
+    //         const produto = this.produtoRepository.create(dto);
+    //         return await this.produtoRepository.save(produto);
+    //     }
+    //      catch (error) {
+    //         if (error instanceof HttpException) throw error;
+    //         throw new InternalServerErrorException('Erro ao criar produto');
+    //     }
+    // }
 
     async consultaTodos(): Promise<Produto[]> {
         try{
            return await this.produtoRepository.find({
+               where: {ativo: true},
                relations: { "categoria": true},
                order: {nome: 'ASC'},
 
@@ -107,7 +110,8 @@ export class ProdutosService {
     async consultaUnica(id: number): Promise<Produto> {
         try{
         const produto = await this.produtoRepository.findOne({ 
-            where: { produtoId: id }, relations: {'categoria': true} });
+            where: { produtoId: id, ativo: true }, 
+            relations: {'categoria': true} });
 
         if (!produto){
             throw new NotFoundException("Produto não encontrado")
@@ -125,7 +129,9 @@ export class ProdutosService {
             const produto = await this.consultaUnica(id);
 
             if(dto.nome && dto.nome !== produto.nome){
-                const duplicado = await this.produtoRepository.findOne({where: { nome: dto.nome}});
+                const duplicado = await this.produtoRepository.findOne(
+                    {where: { nome: dto.nome, ativo: true}});
+
                 if (duplicado){
                     throw new ConflictException('Já existe um produto com esse nome');
                 }
@@ -147,65 +153,66 @@ export class ProdutosService {
             throw new InternalServerErrorException('Erro ao atualizar produto');
         }
     }
-    async deleta(id: number):  Promise<{mensagem: string}>{
-        try{
-            const produto = await this.consultaUnica(id);
+//     async deleta(id: number):  Promise<{mensagem: string}>{
+//         try{
+//             const produto = await this.consultaUnica(id);
             
-            const totalMovimentacoes = await this.movimentacaoRepository.count({
-                 where: { produtoId: id },
-             });
+//             const totalMovimentacoes = await this.movimentacaoRepository.count({
+//                  where: { produtoId: id },
+//              });
 
-            if(totalMovimentacoes > 0) {
-                 throw new ConflictException( 'Não é possivel remover: este produto está em movimentação');
-             }
+//             if(totalMovimentacoes > 0) {
+//                  throw new ConflictException( 'Não é possivel remover: este produto está em movimentação');
+//              }
 
-            await this.produtoRepository.remove(produto);
+//             await this.produtoRepository.remove(produto);
         
-            return{ mensagem: 'produto removido'};
+//             return{ mensagem: 'produto removido'};
+//     } catch (error) {
+//             console.log(error);
+//             if (error instanceof HttpException) throw error;
+//             throw new InternalServerErrorException('Erro ao remover produto');
+//         }
+// }
+
+    async deleta(id: number, usuarioId: number):  Promise<{mensagem: string}>{
+        try{ 
+            return await this.produtoRepository.manager.transaction(async (manager) => {
+                const produto = await this.consultaUnica(id);
+
+                if (produto.quantidade > 0){
+                    const movimentcaoSaida = manager.create(MovimentacaoEstoque, {
+                        tipo: 'saida',
+                        quantidade: produto.quantidade,
+                        dataMovimentacao: new Date(),
+                        produtoId: produto.produtoId,
+                        usuarioId,
+                    });
+                    await manager.save(movimentcaoSaida);
+                }
+
+                produto.ativo = false;
+                await manager.save(produto)
+
+                const totalMovimentacoes = await manager.count(MovimentacaoEstoque,{
+                    where: {produtoId: id},
+
+                });
+
+                if (totalMovimentacoes > 0){
+                    return { mensagem: 'O estoque foi zerado' };
+                }
+
+                await manager.remove(produto);
+                return { mensagem: 'Produto removido com sucesso' };
+
+
+            });
+
+            
     } catch (error) {
-            console.log(error);
             if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('Erro ao remover produto');
         }
 }
 }
-//     async deleta(id: number, usuarioId: number):  Promise<{mensagem: string}>{
-//         try{ 
-//             return await this.produtoRepository.manager.transaction(async (manager) => {
-//                 const produto = await this.consultaUnica(id);
-
-//                 if (produto.quantidade > 0){
-//                     const movimentcaoSaida = manager.create(MovimentacaoEstoque, {
-//                         tipo: 'saida',
-//                         quantidade: produto.quantidade,
-//                         dataMovimentacao: new Date(),
-//                         produtoId: produto.produtoId,
-//                         usuarioId,
-//                     });
-//                     await manager.save(movimentcaoSaida);
-
-//                     produto.quantidade = 0;
-//                     await manager.save(produto);
-//                 }
-
-//                 const totalMovimentacoes = await manager.count(MovimentacaoEstoque,{
-//                     where: {produtoId: id},
-
-//                 });
-
-//                 if (totalMovimentacoes > 0){
-//                     return { mensagem: 'O estoque foi zerado' };
-//                 }
-
-//                 await manager.remove(produto);
-//                 return { mensagem: 'Produto removido com sucesso' };
-
-
-//             });
-
-            
-//     } catch (error) {
-//             if (error instanceof HttpException) throw error;
-//             throw new InternalServerErrorException('Erro ao remover produto');
-//         }
-// }

@@ -24,6 +24,9 @@ export class MovimentacaoService {
             if (!produto){
                 throw new NotFoundException('Produto não encontrado');
             }
+            if (!produto.ativo){
+                throw new BadRequestException('Porduto já está desativo');
+            }
 
             if ( dto.tipo === 'saida'){
                 if(produto.quantidade < dto.quantidade){
@@ -31,13 +34,12 @@ export class MovimentacaoService {
                         `Estoque insuficiente. Disponivel: ${produto.quantidade}`
                     );
                 }
+                produto.quantidade -= dto.quantidade;
+            } else {
+                produto.quantidade += dto.quantidade;
             }
             
-            if (dto.tipo === 'entrada'){
-                produto.quantidade += dto.quantidade;
-            } else{
-                produto.quantidade -= dto.quantidade;
-            }
+            
 
             await this.produtoRepository.save(produto);
 
@@ -102,6 +104,7 @@ export class MovimentacaoService {
         async estoqueQuantidadeAtual(): Promise <TotalPorNome[]>{
         try{
             const produto = await this.produtoRepository.createQueryBuilder('p')
+            .where('p.ativo = true')
             .select('p.nome','nome')
             .addSelect('p.quantidade', 'total')
             .getRawMany();
@@ -153,6 +156,7 @@ export class MovimentacaoService {
             const baixo = await this.produtoRepository
             .createQueryBuilder('q')
             .where('q.quantidade <= q.quantidadeMin')
+            .andWhere('q.ativo = true')
             .orderBy('q.quantidade', 'ASC')
             .getMany();
             return baixo;
@@ -171,6 +175,7 @@ export class MovimentacaoService {
 
             const sem = await this.movimentacaoRepository.manager.createQueryBuilder(Produto, 'p')
             .leftJoin('p.movimentacao', 'mov')
+            .where('p.ativo = true')
             .groupBy('p.produtoId')
             .having('MAX(mov.dataMovimentacao) < :dataLimite', {dataLimite})
             .orHaving('MAX(mov.dataMovimentacao) IS NULL')

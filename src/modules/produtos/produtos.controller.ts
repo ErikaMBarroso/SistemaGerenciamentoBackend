@@ -16,18 +16,18 @@ export class ProdutosController {
     constructor(private readonly produtoService: ProdutosService){}
 
 
-// @Post()
-// @ApiOperation({ summary:'Cadastra Produto' })
-// @Perfis('administrador')
-//     criar(@Body() dto: CriaProduto, @UsuarioLogado() UsuarioLogado: any){
-//         return this.produtoService.criar(dto, UsuarioLogado.usuarioId);
-//     }
 @Post()
 @ApiOperation({ summary:'Cadastra Produto' })
 @Perfis('administrador')
-    criar(@Body() dto: CriaProduto){
-        return this.produtoService.criar(dto);
+    criar(@Body() dto: CriaProduto, @UsuarioLogado() UsuarioLogado: any){
+        return this.produtoService.criar(dto, UsuarioLogado.usuarioId);
     }
+// @Post()
+// @ApiOperation({ summary:'Cadastra Produto' })
+// @Perfis('administrador')
+//     criar(@Body() dto: CriaProduto){
+//         return this.produtoService.criar(dto);
+//     }
 
 
 @Get()
@@ -55,19 +55,20 @@ atualizar(
     return this.produtoService.atualizar(id, dto);
 }
 
-@Delete(':id')
-@ApiOperation({ summary:'Apaga o produto' })
-@Perfis('administrador')
-deleta(@Param('id', ParseIntPipe) id: number){
-    return this.produtoService.deleta(id);
-}
-
-}
-
 // @Delete(':id')
 // @ApiOperation({ summary:'Apaga o produto' })
 // @Perfis('administrador')
-// deleta(@Param('id', ParseIntPipe) id: number, @UsuarioLogado() UsuarioLogado: any){
-//     return this.produtoService.deleta(id, UsuarioLogado);
+// deleta(@Param('id', ParseIntPipe) id: number){
+//     return this.produtoService.deleta(id);
 // }
+
+// }
+
+@Delete(':id')
+@ApiOperation({ summary:'Apaga o produto' })
+@Perfis('administrador')
+deleta(@Param('id', ParseIntPipe) id: number, @UsuarioLogado() UsuarioLogado: any){
+    return this.produtoService.deleta(id, UsuarioLogado);
+}
+}
 

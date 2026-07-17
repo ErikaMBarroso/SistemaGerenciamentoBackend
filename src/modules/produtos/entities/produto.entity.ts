@@ -34,6 +34,9 @@ export class Produto{
     @Column({  name: 'categoria_id'})
     categoriaId!: number;
 
+    @Column({ default: true })
+    ativo!: boolean;
+
     @OneToMany(() => MovimentacaoEstoque, (movimentacao) => movimentacao.produto)
     movimentacao!: MovimentacaoEstoque[];
 
