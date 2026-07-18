@@ -6,13 +6,14 @@ import { MovimentacaoEstoque } from './entities/movimentacao.entity';
 import { Produto } from '../produtos/entities/produto.entity';
 import { MovimentacaoRepository } from './movimentacao.repository';
 import { ProdutoRepository } from '../produtos/produto.repository';
+import { ProdutosModule } from '../produtos/produtos.module';
 
 @Module({
   imports: [ TypeOrmModule.forFeature([
     MovimentacaoEstoque,
-    Produto,
-  ]),],
+    
+  ]), ProdutosModule,],
   controllers: [MovimentacaoController],
-  providers: [MovimentacaoService,  MovimentacaoRepository, ProdutoRepository]
+  providers: [MovimentacaoService,  MovimentacaoRepository]
 })
 export class MovimentacaoModule {}

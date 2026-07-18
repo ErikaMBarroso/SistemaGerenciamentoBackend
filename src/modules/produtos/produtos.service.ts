@@ -6,24 +6,21 @@ import { CriaProduto } from './dto/criaProduto.dto';
 import { AtualizaProduto } from './dto/atualizaProduto.dto';
 import { Categoria } from '../categoria/entities/categoria.entity';
 import { MovimentacaoEstoque } from '../movimentacao/entities/movimentacao.entity';
+import { ProdutoRepository } from './produto.repository';
 
 @Injectable()
 export class ProdutosService {
     constructor(
-        @InjectRepository(Produto)
-        private produtoRepository: Repository<Produto>,
+         private readonly produtoRepository: ProdutoRepository,
 
         @InjectRepository(Categoria)
         private categoriaRepository: Repository<Categoria>,
-
-        @InjectRepository(MovimentacaoEstoque)
-        private movimentacaoRepository: Repository<MovimentacaoEstoque>,
     ){}
 
     async criar(dto: CriaProduto, usuarioId: number): Promise<Produto>{
         try{
 
-        const existe = await this.produtoRepository.findOne({where: {nome: dto.nome, marca: dto.marca,}})
+        const existe = await this.produtoRepository.buscaPorNome(dto.nome, dto.marca);
         
         if (existe){
             throw new ConflictException('Produto já cadastrado');
@@ -36,30 +33,8 @@ export class ProdutosService {
         if (!categoria){
             throw new NotFoundException("Categoria não encontrada")
         }
-        
-
-            const produtoCriado  = await this.produtoRepository.manager.transaction(async(manager) => {
-            const produto = manager.create(Produto, dto);
-            const produtoSalvo = await manager.save(produto);
-
-            if (dto.quantidade > 0){
-                const movimentacaoInicial = manager.create(MovimentacaoEstoque, {
-                    tipo: 'entrada',
-                    quantidade: dto.quantidade,
-                    dataMovimentacao: new Date(),
-                    produtoId: produtoSalvo.produtoId,
-                    usuarioId,
-                });
-                await manager.save(movimentacaoInicial)
-
-            }
+         return await this.produtoRepository.criarProduto(dto, usuarioId);
             
-        
-          return produtoSalvo;
-        });
-        return produtoCriado 
-        
-        
     }
          catch (error) {
             console.log(error);
@@ -67,40 +42,11 @@ export class ProdutosService {
             throw new InternalServerErrorException('Erro ao criar produto');
         }
     }
-    // async criar(dto: CriaProduto): Promise<Produto>{
-    //     try{
-
-    //     const existe = await this.produtoRepository.findOne({where: {nome: dto.nome, marca: dto.marca,}})
-        
-    //     if (existe){
-    //         throw new ConflictException('Produto já cadastrado');
-    //     }
-
-    //     const categoria = await this.categoriaRepository.findOne({
-    //         where: { categoriaId: dto.categoriaId},
-    //     });
-
-    //     if (!categoria){
-    //         throw new NotFoundException("Categoria não encontrada")
-    //     }
-        
-    //         const produto = this.produtoRepository.create(dto);
-    //         return await this.produtoRepository.save(produto);
-    //     }
-    //      catch (error) {
-    //         if (error instanceof HttpException) throw error;
-    //         throw new InternalServerErrorException('Erro ao criar produto');
-    //     }
-    // }
+ 
 
     async consultaTodos(): Promise<Produto[]> {
         try{
-           return await this.produtoRepository.find({
-               where: {ativo: true},
-               relations: { "categoria": true},
-               order: {nome: 'ASC'},
-
-           });
+           return await this.produtoRepository.todos();
         } catch(error){
             if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('Erro ao buscar produtos');
@@ -109,10 +55,7 @@ export class ProdutosService {
 
     async consultaUnica(id: number): Promise<Produto> {
         try{
-        const produto = await this.produtoRepository.findOne({ 
-            where: { produtoId: id, ativo: true }, 
-            relations: {'categoria': true} });
-
+        const produto = await this.produtoRepository.achaPorId(id);
         if (!produto){
             throw new NotFoundException("Produto não encontrado")
         }
@@ -129,8 +72,7 @@ export class ProdutosService {
             const produto = await this.consultaUnica(id);
 
             if(dto.nome && dto.nome !== produto.nome){
-                const duplicado = await this.produtoRepository.findOne(
-                    {where: { nome: dto.nome, ativo: true}});
+                const duplicado = await this.produtoRepository.buscaPorNome(dto.nome);
 
                 if (duplicado){
                     throw new ConflictException('Já existe um produto com esse nome');
@@ -147,67 +89,20 @@ export class ProdutosService {
             }
 
             Object.assign(produto, dto);
-            return await this.produtoRepository.save(produto);
+            return await this.produtoRepository.salvar(produto);
         } catch (error){
             if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('Erro ao atualizar produto');
         }
     }
-//     async deleta(id: number):  Promise<{mensagem: string}>{
-//         try{
-//             const produto = await this.consultaUnica(id);
-            
-//             const totalMovimentacoes = await this.movimentacaoRepository.count({
-//                  where: { produtoId: id },
-//              });
 
-//             if(totalMovimentacoes > 0) {
-//                  throw new ConflictException( 'Não é possivel remover: este produto está em movimentação');
-//              }
 
-//             await this.produtoRepository.remove(produto);
-        
-//             return{ mensagem: 'produto removido'};
-//     } catch (error) {
-//             console.log(error);
-//             if (error instanceof HttpException) throw error;
-//             throw new InternalServerErrorException('Erro ao remover produto');
-//         }
-// }
-
-    async deleta(id: number, usuarioId: number):  Promise<{mensagem: string}>{
+    async deleta(id: number):  Promise<{mensagem: string}>{
         try{ 
-            return await this.produtoRepository.manager.transaction(async (manager) => {
-                const produto = await this.consultaUnica(id);
+            const produto = await this.consultaUnica(id);
 
-                if (produto.quantidade > 0){
-                    const movimentcaoSaida = manager.create(MovimentacaoEstoque, {
-                        tipo: 'saida',
-                        quantidade: produto.quantidade,
-                        dataMovimentacao: new Date(),
-                        produtoId: produto.produtoId,
-                        usuarioId,
-                    });
-                    await manager.save(movimentcaoSaida);
-                }
-
-                produto.ativo = false;
-                await manager.save(produto)
-
-                const totalMovimentacoes = await manager.count(MovimentacaoEstoque,{
-                    where: {produtoId: id},
-
-                });
-
-                if (totalMovimentacoes > 0){
-                    return { mensagem: 'O estoque foi zerado' };
-                }
-
-                await manager.remove(produto);
-                return { mensagem: 'Produto removido com sucesso' };
-
-
-            });
+            return await this.produtoRepository.deletarProduto(produto);
+            
 
             
     } catch (error) {

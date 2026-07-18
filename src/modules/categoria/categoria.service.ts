@@ -4,21 +4,22 @@ import { Categoria } from './entities/categoria.entity';
 import { Repository } from 'typeorm';
 import { CriaCategoria } from './dto/criaCategoria.dto';
 import { AtualizaCategoria } from './dto/atualizaCategoria.dto';
+import { CategoriaRepository } from './categoria.repository';
 
 @Injectable()
 export class CategoriaService {
     constructor(
-        @InjectRepository(Categoria)
-        private categoriaRepository: Repository<Categoria>
+        private readonly categoriaRepository: CategoriaRepository,
     ){}
     async criaCategoria(dto:CriaCategoria ): Promise<Categoria>{
         try{
-            const existe = await this.categoriaRepository.findOne({ where: {nome: dto.nome}})
-            if(existe){
+            const existe = await this.categoriaRepository.buscaNome(dto.nome);
+            
+            if (existe){
                 throw new ConflictException('Categoria já cadastrado');
             }
-            const categoria = this.categoriaRepository.create(dto);
-            return await this.categoriaRepository.save(categoria);
+            const categoria = this.categoriaRepository.criar(dto);
+            return await this.categoriaRepository.salvar(categoria);
         }
         catch(error){
             if (error instanceof HttpException) throw error;
@@ -29,9 +30,7 @@ export class CategoriaService {
 
     async consultaCategoria(): Promise<Categoria[]>{
         try{
-            return  await this.categoriaRepository.find({
-                order: { nome: 'ASC'}
-            });
+            return  await this.categoriaRepository.todos();
 
             
         }catch(error){
@@ -42,8 +41,7 @@ export class CategoriaService {
 
     async consultaUnicaCategoria(id: number): Promise<Categoria> {
             try{
-            const categoria = await this.categoriaRepository.findOne({ 
-                where: { categoriaId: id }, relations: { produtos: true}, });
+            const categoria = await this.categoriaRepository.buscaPorId(id)
             if (!categoria){
                 throw new NotFoundException("Categoria não encontrado")
             }
@@ -60,15 +58,14 @@ export class CategoriaService {
             const categoria = await this.consultaUnicaCategoria(id);
 
             if(dto.nome && dto.nome !== categoria.nome){
-                const duplicado = await this.categoriaRepository.findOne({where: { nome:dto.nome}});
-
+                const duplicado = await this.categoriaRepository.buscaNome(dto.nome)
 
                 if(duplicado){
                     throw new ConflictException('Já existe categoria com esse nome ')
                 }
             }
             Object.assign(categoria, dto);
-            return await this.categoriaRepository.save(categoria);
+            return await this.categoriaRepository.salvar(categoria);
 
 
         } catch(error){
@@ -88,7 +85,7 @@ export class CategoriaService {
                 );
             }
 
-            await this.categoriaRepository.remove(categoria);
+            await this.categoriaRepository.deletaCategoria(categoria);
             
             return { mensagem: 'categoria removida'}
         }

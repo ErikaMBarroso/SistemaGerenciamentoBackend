@@ -1,13 +1,18 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { MovimentacaoEstoque } from "./entities/movimentacao.entity";
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
+import { Produto } from "../produtos/entities/produto.entity";
+import { MovimentacaoDto } from "./dto/movimentacao.dto";
 
 @Injectable()
 export class MovimentacaoRepository{
     constructor(
         @InjectRepository(MovimentacaoEstoque)
         private readonly repository: Repository<MovimentacaoEstoque>,
+        
+        private readonly dataSource: DataSource,
+        
     ){}
 
     salvar(movimentacao: MovimentacaoEstoque){
@@ -17,6 +22,25 @@ export class MovimentacaoRepository{
     criar(dados: Partial<MovimentacaoEstoque>){
         return this.repository.create(dados);
     }
+
+    criaMovimentacao(produto: Produto, dto: MovimentacaoDto, usuarioId: number): Promise<MovimentacaoEstoque>{
+        return this.dataSource.transaction(async (manager) => {
+            await manager.save(produto);
+
+            const movimentacao = manager.create(MovimentacaoEstoque, {
+                tipo: dto.tipo,
+                quantidade: dto.quantidade,
+                dataMovimentacao:  new Date(),
+                produtoId: dto.produtoId,
+                usuarioId,
+            });
+            return await manager.save(movimentacao);
+        });
+        
+
+    }
+
+
     consultaMovimentacao(){
 
         return this.repository.createQueryBuilder('m')

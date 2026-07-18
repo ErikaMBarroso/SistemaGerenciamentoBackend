@@ -33,25 +33,16 @@ export class MovimentacaoService {
                         `Estoque insuficiente. Disponivel: ${produto.quantidade}`
                     );
                 }
+                
                 produto.quantidade -= dto.quantidade;
             } else {
                 produto.quantidade += dto.quantidade;
             }
+
+            return await this.movimentacaoRepository.criaMovimentacao(
+                produto, dto, usuarioId,);
             
             
-
-            await this.produtoRepository.salvar(produto);
-
-            const movimentacao = this.movimentacaoRepository.criar({
-                tipo: dto.tipo,
-                quantidade: dto.quantidade,
-                dataMovimentacao:  new Date(),
-                produtoId: dto.produtoId,
-                usuarioId,
-            });
-
-            return await this.movimentacaoRepository.salvar(movimentacao);
-        
         }
         catch(error){
             console.error(error);
