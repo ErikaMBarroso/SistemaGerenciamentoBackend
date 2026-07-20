@@ -18,7 +18,7 @@ CREATE TABLE produtos (
   marca VARCHAR(100) NOT NULL,
   descricao TEXT,
   preco DECIMAL(10,2),
-  ativo BOOLEAN,
+  ativo BOOLEAN NOT NULL DEFAULT true,
   quantidade INT NOT NULL DEFAULT 0 CHECK (quantidade >= 0),
   quantidade_min INT NOT NULL DEFAULT 5 CHECK (quantidade_min >= 0),
   

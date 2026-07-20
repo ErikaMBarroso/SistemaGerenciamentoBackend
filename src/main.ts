@@ -2,13 +2,13 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { swaggerConfig } from './config/config.swagger';
+import { corsConfig } from './config/config.cors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.enableCors({origin: 'http://localhost:5173',
-    credentials:true,
-  });
+  app.enableCors(corsConfig());
   
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
@@ -18,12 +18,7 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   
-  const config = new DocumentBuilder()
-  .setTitle('Sistema de Gerenciamento para Pet Shop')
-  .setDescription('O Sistema de Gerenciamento para Pet Shop é uma aplicação web desenvolvida para centralizar e facilitar o gerenciamento das operações de um pet shop')
-  .addBearerAuth()
-  .setVersion('1.0')
-  .build();
+  const config = swaggerConfig();
 
   const documenter = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documenter);
