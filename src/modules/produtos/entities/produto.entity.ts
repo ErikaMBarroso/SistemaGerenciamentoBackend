@@ -17,7 +17,9 @@ export class Produto{
     @Column({ length: 100})
     marca!: string;
 
-    @Column({ type: 'decimal', precision: 10, scale: 2})
+    @Column({ type: 'decimal', precision: 10, scale: 2, transformer: {
+    to: (value: number) => value,
+    from: (value: string) => Number(value),},})
     preco!: number;
 
     @Column({ default: 0})
