@@ -149,4 +149,27 @@ export class ProdutoRepository{
             .getMany();
 
     }
+
+    async TotalProdutos(): Promise<{totalProdutos: number, totalEstoque: number, valorEstoque: number}>{
+        const resultado = await this.repository.createQueryBuilder('p')
+        .select('COUNT(p.produtoId)', 'totalProdutos')
+        .addSelect('COALESCE(SUM(p.quantidade), 0)', 'totalEstoque')
+        .addSelect('COALESCE(SUM(p.preco * p.quantidade), 0', 'valorEstoque')
+        .where('p.ativo = true')
+        .getRawOne();
+
+        return {
+            totalProdutos: Number(resultado.totalProdutos),
+            totalEstoque: Number(resultado.totalEstoque),
+            valorEstoque: Number(resultado.valorEstoque),
+        };
+   
+    }
+    estoqueBaixoDash(): Promise<number> {
+        return this.repository.createQueryBuilder('q')
+            .where('q.quantidade <= q.quantidadeMin')
+            .andWhere('q.ativo = true')
+            .getCount();
+    }
+
 }

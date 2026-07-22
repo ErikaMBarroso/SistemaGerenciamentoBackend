@@ -32,6 +32,10 @@ export class CategoriaRepository{
         });
     }
 
+    categoriasCadastradas(): Promise<number>{
+        return this.repository.count();
+    }
+
     criar(dto: Partial<Categoria>){
         return this.repository.create(dto);
     }

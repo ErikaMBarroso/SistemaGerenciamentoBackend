@@ -67,6 +67,27 @@ export class ProdutosService {
     }
     }
 
+    async TotalProdutos(){
+        try{
+            return await this.produtoRepository.TotalProdutos()
+
+        } catch(error){
+        if (error instanceof HttpException) throw error;
+            throw new InternalServerErrorException('Erro ao buscar total de produtos');
+
+    }
+    }
+
+    async estoqueBaixoDash(){
+        try{
+            return await this.produtoRepository.estoqueBaixoDash();
+            
+        }catch(error){
+        if (error instanceof HttpException) throw error;
+            throw new InternalServerErrorException('Erro ao buscar total de produtos');
+    }
+    }
+
     async atualizar(id: number, dto: AtualizaProduto): Promise<Produto>{
         try {
             const produto = await this.consultaUnica(id);

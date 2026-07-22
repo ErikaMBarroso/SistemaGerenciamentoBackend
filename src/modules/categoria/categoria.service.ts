@@ -53,6 +53,17 @@ export class CategoriaService {
         }
         }
 
+    async categoriasCadastrada(){
+        try{
+            return await this.categoriaRepository.categoriasCadastradas();
+
+        }catch(error){
+            if (error instanceof HttpException) throw error;
+                throw new InternalServerErrorException('Erro ao buscar total de categoria');
+    
+        }
+    }
+
     async atualizaCategoria(id: number, dto: AtualizaCategoria ): Promise<Categoria>{
         try{
             const categoria = await this.consultaUnicaCategoria(id);
