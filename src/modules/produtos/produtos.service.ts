@@ -72,6 +72,7 @@ export class ProdutosService {
             return await this.produtoRepository.TotalProdutos()
 
         } catch(error){
+            console.log(error)
         if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('Erro ao buscar total de produtos');
 

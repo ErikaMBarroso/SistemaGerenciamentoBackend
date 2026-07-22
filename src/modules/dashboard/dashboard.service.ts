@@ -25,7 +25,7 @@ export class DashboardService {
             estoqueTotal: somaGeral.totalEstoque,
             valorEmEstoque: somaGeral.valorEstoque,
             baixoEstoqque: estoqueBaixo,
-            categoriasCdastradas:categorias,
+            categoriasCadastradas:categorias,
         }
     }
 

@@ -154,7 +154,7 @@ export class ProdutoRepository{
         const resultado = await this.repository.createQueryBuilder('p')
         .select('COUNT(p.produtoId)', 'totalProdutos')
         .addSelect('COALESCE(SUM(p.quantidade), 0)', 'totalEstoque')
-        .addSelect('COALESCE(SUM(p.preco * p.quantidade), 0', 'valorEstoque')
+        .addSelect('COALESCE(SUM(p.preco * p.quantidade), 0)', 'valorEstoque')
         .where('p.ativo = true')
         .getRawOne();
 
