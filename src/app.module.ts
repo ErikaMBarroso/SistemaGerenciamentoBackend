@@ -11,6 +11,7 @@ import { ProdutosModule } from './modules/produtos/produtos.module';
 import { DatabaseModule } from './database/databaseModule';
 import { MovimentacaoModule } from './modules/movimentacao/movimentacao.module';
 import { CategoriaModule } from './modules/categoria/categoria.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 
 @Module({
@@ -18,6 +19,8 @@ import { CategoriaModule } from './modules/categoria/categoria.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+
+    ThrottlerModule.forRoot([{ttl: 60_000, limit: 5,},]),
 
     DatabaseModule,
     UserModule,
