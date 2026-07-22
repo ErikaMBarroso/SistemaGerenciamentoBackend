@@ -4,10 +4,13 @@ import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { swaggerConfig } from './config/config.swagger';
 import { corsConfig } from './config/config.cors';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.use(helmet());
+  
   app.enableCors(corsConfig());
   
   app.useGlobalPipes(new ValidationPipe({
@@ -22,7 +25,6 @@ async function bootstrap() {
 
   const documenter = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documenter);
-
 
   await app.listen(process.env.PORT ?? 3001);
 }
