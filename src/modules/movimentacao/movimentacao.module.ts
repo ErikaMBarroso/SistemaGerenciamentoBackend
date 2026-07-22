@@ -14,6 +14,7 @@ import { ProdutosModule } from '../produtos/produtos.module';
     
   ]), ProdutosModule,],
   controllers: [MovimentacaoController],
-  providers: [MovimentacaoService,  MovimentacaoRepository]
+  providers: [MovimentacaoService,  MovimentacaoRepository],
+  exports:[MovimentacaoService],
 })
 export class MovimentacaoModule {}

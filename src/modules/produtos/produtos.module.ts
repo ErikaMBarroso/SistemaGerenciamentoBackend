@@ -11,6 +11,6 @@ import { ProdutoRepository } from './produto.repository';
   imports: [TypeOrmModule.forFeature([Produto, Categoria, MovimentacaoEstoque])],
   controllers: [ProdutosController],
   providers: [ProdutosService, ProdutoRepository],
-  exports: [ ProdutoRepository]
+  exports: [ ProdutoRepository, ProdutosService],
 })
 export class ProdutosModule {}

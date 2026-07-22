@@ -12,6 +12,7 @@ import { DatabaseModule } from './database/databaseModule';
 import { MovimentacaoModule } from './modules/movimentacao/movimentacao.module';
 import { CategoriaModule } from './modules/categoria/categoria.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 
 @Module({
@@ -28,6 +29,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     ProdutosModule,
     CategoriaModule,
     MovimentacaoModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
