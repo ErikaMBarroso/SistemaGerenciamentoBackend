@@ -136,6 +136,23 @@ export class ProdutoRepository{
             .getMany();
     }
 
+    async estoqueBaixoDash(limite: number = 4): Promise<{nome: string; quantidade: number}[]>{
+       const resultado = await this.repository.createQueryBuilder('p')
+            .select('p.nome',  'nome')
+            .addSelect('p.quantidade', 'quantidade')
+            .where('p.quantidade <= p.quantidadeMin')
+            .andWhere('p.ativo = true')
+            .orderBy('p.quantidade', 'ASC')
+            .limit(limite)
+            .getRawMany();
+            
+
+            return  resultado.map((r) => ({
+                nome: r.nome,
+                quantidade: Number(r.quantidade),
+            }));
+    }
+
     async semMovimentacao(dias: number){
         const dataLimite = new Date();
         dataLimite.setDate(dataLimite.getDate() - dias);
@@ -165,7 +182,7 @@ export class ProdutoRepository{
         };
    
     }
-    estoqueBaixoDash(): Promise<number> {
+    estoqueBaixoTotal(): Promise<number> {
         return this.repository.createQueryBuilder('q')
             .where('q.quantidade <= q.quantidadeMin')
             .andWhere('q.ativo = true')

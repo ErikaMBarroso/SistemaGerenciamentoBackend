@@ -79,13 +79,23 @@ export class ProdutosService {
     }
     }
 
-    async estoqueBaixoDash(){
+    async estoqueBaixoTotal(){
         try{
-            return await this.produtoRepository.estoqueBaixoDash();
+            return await this.produtoRepository.estoqueBaixoTotal();
             
         }catch(error){
         if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('Erro ao buscar total de produtos');
+    }
+    }
+    
+    async estoqueBaixoDash(){
+        try{
+            return await this.produtoRepository.estoqueBaixoDash();
+        }
+        catch(error){
+        if (error instanceof HttpException) throw error;
+            throw new InternalServerErrorException('Erro ao buscar resumo de estoque baixo');
     }
     }
 
