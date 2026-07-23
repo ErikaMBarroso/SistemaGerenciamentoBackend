@@ -116,6 +116,19 @@ export class MovimentacaoService {
         }
     
     }
+
+    async movimentacoesHoje(){
+        try{
+            return await this.movimentacaoRepository.movimentacaoHoje();
+        }
+        catch (error) {
+            console.error(error)
+            if (error instanceof HttpException) throw error;
+            throw new InternalServerErrorException('Erro ao buscar movimentação de hoje');
+        }
+    }
+
+
     async semMovimentacao(dias: number): Promise<Produto[]>{
         try{
             return this.produtoRepository.semMovimentacao(dias);

@@ -80,6 +80,28 @@ export class MovimentacaoRepository{
             .getRawMany();
     }
 
+    async movimentacaoHoje():  Promise<{entradas:number; saidas: number}>{
+        const inicioHoje = new Date();
+        inicioHoje.setHours(0, 0, 0, 0);
+        
+        const fimHoje = new Date(inicioHoje);
+        fimHoje.setDate(fimHoje.getDate() + 1);
+
+        const resultadoHoje = await this.repository.createQueryBuilder('m')
+        .select('m.tipo', 'tipo')
+        .addSelect('COUNT(m.id)', 'total')
+        .where('m.dataMovimentacao >= :inicioHoje AND m.dataMovimentacao < :fimHoje', { inicioHoje, fimHoje })
+        .groupBy('m.tipo')
+        .getRawMany();
+
+        const mapa = new Map(resultadoHoje.map((r) => [r.tipo, Number(r.total)]));
+
+        return {
+            entradas: mapa.get('entrada') ?? 0,
+            saidas :  mapa.get('saida') ?? 0,
+        };
+    }
+
     historicoMovimentacao() {
         return this.repository.find({
                 relations: {usuario: true, produto: true},

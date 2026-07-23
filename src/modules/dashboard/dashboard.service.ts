@@ -14,17 +14,18 @@ export class DashboardService {
     ){}
 
     async dashboard(){
-        const [ somaGeral, estoqueBaixo , categorias] = await Promise.all([
+        const [ somaGeral, estoqueBaixo , categorias, movimentacaoHoje] = await Promise.all([
             this.produtoService.TotalProdutos(),
             this.produtoService.estoqueBaixoDash(),
             this.categoriaService.categoriasCadastradas(),
+            this.movimentacaoService.movimentacoesHoje(),
         ]);
 
         return {
             produtosCadastrados: somaGeral.totalProdutos,
             estoqueTotal: somaGeral.totalEstoque,
             valorEmEstoque: somaGeral.valorEstoque,
-            baixoEstoqque: estoqueBaixo,
+            baixoEstoque: estoqueBaixo, movimentacaoHoje,
             categoriasCadastradas:categorias,
         }
     }
