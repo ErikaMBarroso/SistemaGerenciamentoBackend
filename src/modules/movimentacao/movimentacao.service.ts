@@ -140,5 +140,15 @@ export class MovimentacaoService {
         }
     }
 
+    async produtoMaisVendidos(){
+        try{
+            return await this.movimentacaoRepository.produtoMaisVendidos();
+        }
+        catch(error){
+        if (error instanceof HttpException) throw error;
+            throw new InternalServerErrorException('Erro ao buscar produto mais vendido');
+    }
+    }
+
 
 }

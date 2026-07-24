@@ -102,6 +102,24 @@ export class MovimentacaoRepository{
         };
     }
 
+    async produtoMaisVendidos(limite: number = 4): Promise<{nome: string; quantidadeVendida: number}[]>{
+       const resultado = await this.repository.createQueryBuilder('m')
+            .innerJoin('m.prouto', 'p')
+            .select('p.nome', 'nome')
+            .addSelect('SUM(m.quantidade)', 'quantidadeVendida')
+            .where('m.tipo = :tipo', {tipo: 'saida'})
+            .addGroupBy('p.nome')
+            .orderBy('"quantidadeVendida"', 'DESC')
+            .limit(limite)
+            .getRawMany();
+            
+
+            return  resultado.map((r) => ({
+                nome: r.nome,
+                quantidadeVendida: Number(r.quantidadeVendida),
+            }));
+    }
+
     historicoMovimentacao() {
         return this.repository.find({
                 relations: {usuario: true, produto: true},
