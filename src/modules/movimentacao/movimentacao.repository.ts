@@ -137,5 +137,22 @@ export class MovimentacaoRepository{
             });
     }
 
+    async graficoLinha(semanas: number){
+        const dataInicio = new Date();
+        dataInicio.setDate(dataInicio.getDate() - semanas * 7);
+
+        const resultado = await this.repository.createQueryBuilder('m')
+        .select(`ddate_trunc('week', m.dataMovimentacao)`, 'semana')
+        .addSelect('m.tipo', 'tipo')
+        .addSelect('SUM(m.quantidade)', 'total')
+        .where('m.dataMpvimentacao >= :dataInicio', {dataInicio})
+        .groupBy('semana')
+        .addGroupBy('m.tipo')
+        .orderBy('semana', 'ASC')
+        .getRawMany()
+
+        return resultado
+    }
+
 
 }
