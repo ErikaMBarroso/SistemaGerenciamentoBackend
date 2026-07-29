@@ -66,6 +66,12 @@ export class MovimentacaoController {
         return this.movimentacaoService.semMovimentacao(dias ? Number(dias): 30)
     }
 
+    @Get('graficoLinha')
+    @ApiOperation({summary: 'Movimentações por período (gráfico de linha)'})
+    graficoLinha(@Query('periodo') periodo?: string){
+        return this.movimentacaoService.graficoLinha(periodo);
+    }
+
     @Get(':produtoId')
     @ApiOperation({ summary:'Cadastra Produto' })
     @UseGuards(JwtAuthGuard)

@@ -137,18 +137,18 @@ export class MovimentacaoRepository{
             });
     }
 
-    async graficoLinha(semanas: number){
+    async graficoLinha(dias: number){
         const dataInicio = new Date();
-        dataInicio.setDate(dataInicio.getDate() - semanas * 7);
+        dataInicio.setDate(dataInicio.getDate() - dias);
 
         const resultado = await this.repository.createQueryBuilder('m')
-        .select(`ddate_trunc('week', m.dataMovimentacao)`, 'semana')
+        .select(`date_trunc('week', m.dataMovimentacao)`, 'periodo')
         .addSelect('m.tipo', 'tipo')
         .addSelect('SUM(m.quantidade)', 'total')
-        .where('m.dataMpvimentacao >= :dataInicio', {dataInicio})
-        .groupBy('semana')
+        .where('m.dataMovimentacao >= :dataInicio', {dataInicio})
+        .groupBy('periodo')
         .addGroupBy('m.tipo')
-        .orderBy('semana', 'ASC')
+        .orderBy('periodo', 'ASC')
         .getRawMany()
 
         return resultado

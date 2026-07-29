@@ -150,5 +150,64 @@ export class MovimentacaoService {
     }
     }
 
+    async graficoLinha(periodo: string = '30dias'){
+        try{
+            const dias = this.periodoDias(periodo);
+            const dado = await this.movimentacaoRepository.graficoLinha(dias)
+         
+            const totalSemanas = Math.ceil(dias/7);
+            
+            const hoje = new Date();
+            const eixoSemanas: {chave: string; label: string}[] = [];
+            
+
+            for(let i =totalSemanas -1; i>=0; i--){
+                const data = new Date(hoje);
+                data.setDate(data.getDate() - i * 7);
+                const inicio = this.inicioDaSemana(data);
+                const chave = inicio.toISOString();
+                const label = inicio.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'})
+                eixoSemanas.push({ chave, label});
+            }
+
+            const mapa = new Map<string, number>();
+            for ( const linha of dado){
+                 const chave = `${new Date(linha.periodo).toISOString()}|${linha.tipo}`;
+                mapa.set(chave, Number(linha.total));
+            }
+           
+
+            return eixoSemanas.map(({ chave, label}) =>({
+                semana: label,
+                entrada: mapa.get(`${chave}|entrada`) ?? 0,
+                saida: mapa.get(`${chave}|saida`) ?? 0,
+            }));
+        }catch (error) {
+            console.error(error)
+            if (error instanceof HttpException) throw error;
+            throw new InternalServerErrorException('Erro ao buscar fluxo da movimentação');
+        }
+    
+    }   
+    private inicioDaSemana(data: Date): Date{
+        const d = new Date(data);
+        const dia = d.getDay();
+        const diff = d.getDate() - dia + (dia === 0 ? -6 : 1);
+        d.setDate(diff);
+        d.setHours(0, 0, 0, 0);
+        return d
+    }
+    private periodoDias(periodo): number {
+        const mapa: Record<string, number> ={
+        '7dias': 7,
+        '30dias': 30,
+        '3meses': 90,
+        '1ano': 365,
+
+        }
+    
+    return mapa[periodo]?? 30;
+    };
+
 
 }
