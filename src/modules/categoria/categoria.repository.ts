@@ -51,7 +51,7 @@ export class CategoriaRepository{
 
     async graficoBarras(){
         const resultado = await this.repository.createQueryBuilder('c')
-        .leftJoin('c.produtos', 'p', 'pativo = true')
+        .leftJoin('c.produtos', 'p', 'p.ativo = true')
         .select('c.nome', 'nome')
         .addSelect('SUM(p.quantidade)', 'total')
         .groupBy('c.categoriaId')
