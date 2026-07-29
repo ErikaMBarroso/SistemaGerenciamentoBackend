@@ -64,6 +64,17 @@ export class CategoriaService {
         }
     }
 
+    async graficoBarras(){
+        try{
+                return await this.categoriaRepository.graficoBarras();
+        }
+        catch(error){
+            if (error instanceof HttpException) throw error;
+                throw new InternalServerErrorException('Erro ao buscar total de categoria para o Grafico de Barras');
+    
+        }
+    }
+
     async atualizaCategoria(id: number, dto: AtualizaCategoria ): Promise<Categoria>{
         try{
             const categoria = await this.consultaUnicaCategoria(id);

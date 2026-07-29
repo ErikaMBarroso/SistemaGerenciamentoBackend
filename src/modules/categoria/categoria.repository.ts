@@ -49,6 +49,21 @@ export class CategoriaRepository{
         return this.repository.remove(categoria);
     }
 
+    async graficoBarras(){
+        const resultado = await this.repository.createQueryBuilder('c')
+        .leftJoin('c.produtos', 'p', 'pativo = true')
+        .select('c.nome', 'nome')
+        .addSelect('SUM(p.quantidade)', 'total')
+        .groupBy('c.categoriaId')
+        .addGroupBy('c.nome')
+        .orderBy('total', 'DESC')
+        .getRawMany();
+
+        return resultado.map((r) =>({
+            nome: r.nome,
+            total: Number(r.total),
+        }));
+    }
     
 
 }
