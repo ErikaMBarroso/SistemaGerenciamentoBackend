@@ -6,7 +6,7 @@ import { Perfis } from '../auth/auth.decorator';
 import { CriaProduto } from './dto/criaProduto.dto';
 import { AtualizaProduto } from './dto/atualizaProduto.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { UsuarioLogado } from 'src/common/decorators/usuarioLogado.decorators';
+import { UsuarioLogado } from '../../common/decorators/usuarioLogado.decorators';
 
 @ApiTags('produto')
 @ApiBearerAuth()

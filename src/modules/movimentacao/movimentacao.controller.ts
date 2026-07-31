@@ -3,7 +3,7 @@ import { MovimentacaoService } from './movimentacao.service';
 import { MovimentacaoDto } from './dto/movimentacao.dto';
 import { JwtAuthGuard } from '../auth/auth.guard';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { UsuarioLogado } from 'src/common/decorators/usuarioLogado.decorators';
+import { UsuarioLogado } from '../../common/decorators/usuarioLogado.decorators';
 import { Perfis } from '../auth/auth.decorator';
 import { RolesGuard } from '../auth/role.guard';
 

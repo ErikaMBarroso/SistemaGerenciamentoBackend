@@ -1,5 +1,5 @@
-import { Produto } from "src/modules/produtos/entities/produto.entity";
-import { Usuario } from "src/modules/user/entities/user.entity";
+import { Produto } from "../../produtos/entities/produto.entity";
+import { Usuario } from "../../user/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('movimentacoes')
