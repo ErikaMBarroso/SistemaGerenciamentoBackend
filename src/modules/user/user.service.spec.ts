@@ -32,7 +32,7 @@ describe('UserService', () => {
 
   it('deve buscar usuário pelo email', async () => {
     const usuario = {
-      usuarioId: 1,
+      usuarioId: 3,
       email: 'admin@admin.com',
     } as Usuario;
 
@@ -65,11 +65,11 @@ describe('UserService', () => {
 
     repository.findOne.mockResolvedValue(usuario);
 
-    const result = await service.findById(10);
+    const result = await service.findById(3);
 
     expect(repository.findOne).toHaveBeenCalledWith({
       where: {
-        usuarioId: 10,
+        usuarioId: 3,
       },
     });
 

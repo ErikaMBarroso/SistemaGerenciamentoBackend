@@ -1,24 +1,35 @@
 import { HttpException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Usuario } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
 
     constructor(
-        @InjectRepository(Usuario)
-        private usuarioRepository: Repository<Usuario>, 
+        
+        private usuarioRepository: UserRepository, 
     ) {}
 
     async findByEmail(email: string): Promise<Usuario | null>{
-        return this.usuarioRepository.findOne({ where: {email}});
+        try{ 
+            return this.usuarioRepository.buscaEmail(email);
+        }
+        catch(error){
+            console.log(error)
+        if (error instanceof HttpException) throw error;
+            throw new InternalServerErrorException('Erro ao buscar credencial');
+    }
     }
 
    async findById(id: number): Promise<Usuario | null>{
-        return this.usuarioRepository.findOne({ where: {usuarioId: id}});
+        try{
+            return this.usuarioRepository.procuraId(id);
+        }
+        catch(error){
+            console.log(error)
+        if (error instanceof HttpException) throw error;
+            throw new InternalServerErrorException('Erro ao buscar credencial');
     }
-
-   
-
+    }
 }
