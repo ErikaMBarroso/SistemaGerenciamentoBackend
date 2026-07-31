@@ -16,7 +16,6 @@ export class UserService {
             return this.usuarioRepository.buscaEmail(email);
         }
         catch(error){
-            console.log(error)
         if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('Erro ao buscar credencial');
     }
@@ -27,7 +26,6 @@ export class UserService {
             return this.usuarioRepository.procuraId(id);
         }
         catch(error){
-            console.log(error)
         if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('Erro ao buscar credencial');
     }
