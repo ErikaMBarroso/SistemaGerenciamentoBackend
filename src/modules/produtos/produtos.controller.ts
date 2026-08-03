@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Req, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, Req, Request, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/role.guard';
 import { ProdutosService } from './produtos.service';
@@ -7,6 +7,7 @@ import { CriaProduto } from './dto/criaProduto.dto';
 import { AtualizaProduto } from './dto/atualizaProduto.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UsuarioLogado } from '../../common/decorators/usuarioLogado.decorators';
+import { ConsultaProduto } from './dto/consultaProduto';
 
 @ApiTags('produto')
 @ApiBearerAuth()
@@ -22,21 +23,22 @@ export class ProdutosController {
     criar(@Body() dto: CriaProduto, @UsuarioLogado() UsuarioLogado: any){
         return this.produtoService.criar(dto, UsuarioLogado.usuarioId);
     }
-// @Post()
-// @ApiOperation({ summary:'Cadastra Produto' })
+
+
+
+// @Get()
+// @ApiOperation({ summary:'Consulta Produto' })
 // @Perfis('administrador')
-//     criar(@Body() dto: CriaProduto){
-//         return this.produtoService.criar(dto);
+//     consultaTodos(){
+//         return this.produtoService.consultaTodos();
 //     }
 
-
 @Get()
-@ApiOperation({ summary:'Consulta Produto' })
+@ApiOperation({ summary:'Lista Produtos' })
 @Perfis('administrador')
-    consultaTodos(){
-        return this.produtoService.consultaTodos();
-    }
-
+listar(@Query() filtro: ConsultaProduto){
+    return this.produtoService.listar(filtro);
+}
 
 @Get(':id')
 @ApiOperation({ summary:'Consulta única do produto' })
@@ -64,11 +66,4 @@ deleta(@Param('id', ParseIntPipe) id: number){
 
 }
 
-// @Delete(':id')
-// @ApiOperation({ summary:'Apaga o produto' })
-// @Perfis('administrador')
-// deleta(@Param('id', ParseIntPipe) id: number, @UsuarioLogado() UsuarioLogado: any){
-//     return this.produtoService.deleta(id, UsuarioLogado);
-// }
-// }
 

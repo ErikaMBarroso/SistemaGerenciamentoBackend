@@ -7,6 +7,7 @@ import { AtualizaProduto } from './dto/atualizaProduto.dto';
 import { Categoria } from '../categoria/entities/categoria.entity';
 import { MovimentacaoEstoque } from '../movimentacao/entities/movimentacao.entity';
 import { ProdutoRepository } from './produto.repository';
+import { ConsultaProduto } from './dto/consultaProduto';
 
 @Injectable()
 export class ProdutosService {
@@ -44,13 +45,24 @@ export class ProdutosService {
     }
  
 
-    async consultaTodos(): Promise<Produto[]> {
+    // async consultaTodos(): Promise<Produto[]> {
+    //     try{
+    //        return await this.produtoRepository.todos();
+    //     } catch(error){
+    //         if (error instanceof HttpException) throw error;
+    //         throw new InternalServerErrorException('Erro ao buscar produtos');
+    //     }
+    // }
+    async listar(filtro: ConsultaProduto){
         try{
-           return await this.produtoRepository.todos();
-        } catch(error){
-            if (error instanceof HttpException) throw error;
-            throw new InternalServerErrorException('Erro ao buscar produtos');
+            return await this.produtoRepository.listaProdutos(filtro);
         }
+        catch(error){
+        console.log(error)
+        if (error instanceof HttpException) throw error;
+            throw new InternalServerErrorException('Erro ao buscar produtos');
+
+    }
     }
 
     async consultaUnica(id: number): Promise<Produto> {

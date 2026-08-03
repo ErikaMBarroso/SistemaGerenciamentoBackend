@@ -1,10 +1,11 @@
-import {  Injectable } from "@nestjs/common";
+import {  Injectable, Search } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Produto } from "./entities/produto.entity";
 import { DataSource, Repository } from "typeorm";
 import { Categoria } from "../categoria/entities/categoria.entity";
 import { MovimentacaoEstoque } from "../movimentacao/entities/movimentacao.entity";
 import { CriaProduto } from "./dto/criaProduto.dto";
+import { ConsultaProduto } from "./dto/consultaProduto";
 
 @Injectable()
 export class ProdutoRepository{
@@ -67,20 +68,46 @@ export class ProdutoRepository{
 
    
 
-    todos(){
-        return this.repository.find({
-            where:{
-                ativo: true
-            },
-            relations:{
-                categoria: true
-            },
-            order:{
-                nome: 'ASC'
-            }
-        });
+    // todos(){
+    //     return this.repository.find({
+    //         where:{
+    //             ativo: true
+    //         },
+    //         relations:{
+    //             categoria: true
+    //         },
+    //         order:{
+    //             nome: 'ASC'
+    //         }
+    //     });
+    // }
+
+    async listaProdutos(filtro: ConsultaProduto){
+
+        const {pesquisa, ordem = 'nome', ordemBy = 'ASC', paginas = 1, total = 10} = filtro
+        const  resultado =  this.repository
+            .createQueryBuilder('p')
+            .leftJoinAndSelect('p.categoria', 'categoria')
+            .where('p.ativo = ativo');
+        if(pesquisa){
+        resultado.andWhere('p.nome ILIKE :search', { pesquisa: `%${pesquisa}%` });
+        }
+        
+        resultado
+            .orderBy(`p.${ordemBy}`, ordemBy)
+            .skip((paginas - 1) * total)
+            .take(total);
+
+        const [produtos, totalRegistros] = await resultado.getManyAndCount()
+
+        return {data: produtos,
+        total: totalRegistros,
+        paginas,
+        totalPages: Math.ceil(totalRegistros / total),
+        }
     }
 
+    
 
 
     remover(produto: Produto){
