@@ -13,7 +13,16 @@ describe('MovimentacaoService', () => {
         {
         provide: MovimentacaoRepository,
         useValue:{
-          
+          salvar: jest.fn(),
+           criar : jest.fn(),
+           criaMovimentacao: jest.fn(),
+           consultaMovimentacao: jest.fn(),
+           consultaMovimentacaoIndividual: jest.fn(),
+           consultaMovimentacaoTotal: jest.fn(),
+           movimentacaoHoje: jest.fn(),
+           produtoMaisVendidos: jest.fn(),
+           historicoMovimentacao: jest.fn(),
+           graficoLinha: jest.fn(),
         }
 
         },

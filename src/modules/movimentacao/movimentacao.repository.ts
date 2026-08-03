@@ -42,7 +42,6 @@ export class MovimentacaoRepository{
 
 
     consultaMovimentacao(){
-
         return this.repository.createQueryBuilder('m')
             .leftJoin('m.produto', 'p')
             .select('p.nome', 'nome')

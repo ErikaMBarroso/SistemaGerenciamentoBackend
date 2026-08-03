@@ -12,8 +12,6 @@ export class ProdutoRepository{
         @InjectRepository(Produto)
         private readonly repository: Repository<Produto>,
         
-        @InjectRepository(Categoria)
-        private readonly categoriaRepository: Repository<Categoria>,
 
         @InjectRepository(MovimentacaoEstoque)
         private readonly movimentacaoRepository: Repository<MovimentacaoEstoque>,

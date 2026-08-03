@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CategoriaService } from './categoria.service';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { CategoriaRepository } from './categoria.repository';
+import { Categoria } from './entities/categoria.entity';
 
 describe('CategoriaService', () => {
   let service: CategoriaService;
@@ -13,9 +14,17 @@ describe('CategoriaService', () => {
         {
           provide: CategoriaRepository,
           useValue: {
+            buscaNome: jest.fn(),
+            buscaPorId: jest.fn(),
+            todos: jest.fn(),
+            categoriasCadastradas: jest.fn(),
+            criar: jest.fn(),
+            salvar: jest.fn(),
+            deletaCategoria: jest.fn(),
+            graficoBarras: jest.fn(),
 
-          }
-        }
+          },
+        },
       ],
     }).compile();
 
@@ -26,4 +35,5 @@ describe('CategoriaService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+  
 });

@@ -13,8 +13,20 @@ describe('ProdutosService', () => {
         {
           provide: ProdutoRepository,
           useValue:{
-          }
-        }
+            criar: jest.fn(),
+            salvar: jest.fn(),
+            achaPorId: jest.fn(),
+            buscaPorNome: jest.fn(),
+            remover: jest.fn(),
+            deletarProduto: jest.fn(),
+            estoqueQuantidadeAtual: jest.fn(),
+            estoqueBaixo: jest.fn(),
+            estoqueBaixoDash: jest.fn(),
+            semMovimentacao: jest.fn(),
+            TotalProdutos: jest.fn(),
+            estoqueBaixoTotal: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
