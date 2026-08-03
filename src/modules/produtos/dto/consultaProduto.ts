@@ -6,7 +6,7 @@ export class ConsultaProduto{
 
     @IsOptional()
     @IsString()
-    pesquisa!: string;
+    pesquisa?: string;
 
     @IsOptional()
     @IsIn(['nome', 'quantidade', 'preco', 'quantidadeMin'])

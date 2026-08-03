@@ -88,13 +88,13 @@ export class ProdutoRepository{
         const  resultado =  this.repository
             .createQueryBuilder('p')
             .leftJoinAndSelect('p.categoria', 'categoria')
-            .where('p.ativo = ativo');
+            .where('p.ativo = true');
         if(pesquisa){
-        resultado.andWhere('p.nome ILIKE :search', { pesquisa: `%${pesquisa}%` });
+        resultado.andWhere('p.nome ILIKE :pesquisa', { pesquisa: `%${pesquisa}%` });
         }
         
         resultado
-            .orderBy(`p.${ordemBy}`, ordemBy)
+            .orderBy(`p.${ordem}`, ordemBy)
             .skip((paginas - 1) * total)
             .take(total);
 
