@@ -38,7 +38,6 @@ export class ProdutosService {
             
     }
          catch (error) {
-            console.log(error);
             if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('Erro ao criar produto');
         }

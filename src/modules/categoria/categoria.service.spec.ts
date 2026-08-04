@@ -42,18 +42,18 @@ describe('criaCategoria', () => {
     it('deve criar categoria com sucesso', async () => {
       const dto = {nome: 'Ração'};
       const categoriaCriada = {nome: 'ração'} as Categoria;
-      const categoriaSalava = { categoriaId: 1, nome: 'Ração' } as Categoria;
+      const categoriaSalva = { categoriaId: 1, nome: 'Ração' } as Categoria;
 
       repository.buscaNome.mockResolvedValue(null);
       repository.criar.mockReturnValue(categoriaCriada);
-      repository.salvar.mockResolvedValue(categoriaSalava);
+      repository.salvar.mockResolvedValue(categoriaSalva);
 
       const result = await service.criaCategoria(dto);
 
       expect(repository.buscaNome).toHaveBeenCalledWith('Ração');
       expect(repository.criar).toHaveBeenCalledWith(dto);
       expect(repository.salvar).toHaveBeenCalledWith(categoriaCriada);
-      expect(result).toEqual(categoriaSalava);
+      expect(result).toEqual(categoriaSalva);
 
     });
     
