@@ -45,7 +45,6 @@ export class MovimentacaoService {
             
         }
         catch(error){
-            console.error(error);
             if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('Erro ao registrar movimentação');
         }
@@ -110,7 +109,6 @@ export class MovimentacaoService {
             
 
         }catch (error) {
-            console.error(error)
             if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('Erro ao buscar estoque baixo');
         }
@@ -122,7 +120,6 @@ export class MovimentacaoService {
             return await this.movimentacaoRepository.movimentacaoHoje();
         }
         catch (error) {
-            console.error(error)
             if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('Erro ao buscar movimentação de hoje');
         }
@@ -134,7 +131,6 @@ export class MovimentacaoService {
             return this.produtoRepository.semMovimentacao(dias);
 
         }catch (error) {
-            console.error(error)
             if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('Erro ao buscar produto sem movimentação');
         }
@@ -183,7 +179,6 @@ export class MovimentacaoService {
                 saida: mapa.get(`${chave}|saida`) ?? 0,
             }));
         }catch (error) {
-            console.error(error)
             if (error instanceof HttpException) throw error;
             throw new InternalServerErrorException('Erro ao buscar fluxo da movimentação');
         }
