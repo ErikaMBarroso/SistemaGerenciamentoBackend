@@ -1,4 +1,4 @@
 export interface TotalPorNome {
-    nome: string;
-    total: string; 
+  nome: string;
+  total: string;
 }

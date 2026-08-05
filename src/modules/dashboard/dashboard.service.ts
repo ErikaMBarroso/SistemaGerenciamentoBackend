@@ -5,34 +5,43 @@ import { CategoriaRepository } from '../categoria/categoria.repository';
 
 @Injectable()
 export class DashboardService {
-    constructor( 
-        private readonly produtoService: ProdutosService,
+  constructor(
+    private readonly produtoService: ProdutosService,
 
-        private readonly categoriaService: CategoriaRepository,
+    private readonly categoriaService: CategoriaRepository,
 
-        private readonly movimentacaoService: MovimentacaoService,
-    ){}
+    private readonly movimentacaoService: MovimentacaoService,
+  ) {}
 
-    async dashboard(){
-        const [ somaGeral, estoqueBaixo,estoqueBaixoResumo, categorias, categoriaGrafico, movimentacaoHoje, maisVendidos] = await Promise.all([
-            this.produtoService.TotalProdutos(),
-            this.produtoService.estoqueBaixoTotal(),
-            this.produtoService.estoqueBaixoDash(),
-            this.categoriaService.categoriasCadastradas(),
-            this.categoriaService.graficoBarras(),
-            this.movimentacaoService.movimentacoesHoje(),
-            this.movimentacaoService.produtoMaisVendidos(),
-        ]);
+  async dashboard() {
+    const [
+      somaGeral,
+      estoqueBaixo,
+      estoqueBaixoResumo,
+      categorias,
+      categoriaGrafico,
+      movimentacaoHoje,
+      maisVendidos,
+    ] = await Promise.all([
+      this.produtoService.TotalProdutos(),
+      this.produtoService.estoqueBaixoTotal(),
+      this.produtoService.estoqueBaixoDash(),
+      this.categoriaService.categoriasCadastradas(),
+      this.categoriaService.graficoBarras(),
+      this.movimentacaoService.movimentacoesHoje(),
+      this.movimentacaoService.produtoMaisVendidos(),
+    ]);
 
-        return {
-            produtosCadastrados: somaGeral.totalProdutos,
-            estoqueTotal: somaGeral.totalEstoque,
-            valorEmEstoque: somaGeral.valorEstoque,
-            baixoEstoque: estoqueBaixo,
-            baixoEstoqueResumo: estoqueBaixoResumo, movimentacaoHoje,
-            categoriasCadastradas:categorias, categoriaGrafico, maisVendidos
-        }
-    }
-
-   
+    return {
+      produtosCadastrados: somaGeral.totalProdutos,
+      estoqueTotal: somaGeral.totalEstoque,
+      valorEmEstoque: somaGeral.valorEstoque,
+      baixoEstoque: estoqueBaixo,
+      baixoEstoqueResumo: estoqueBaixoResumo,
+      movimentacaoHoje,
+      categoriasCadastradas: categorias,
+      categoriaGrafico,
+      maisVendidos,
+    };
+  }
 }

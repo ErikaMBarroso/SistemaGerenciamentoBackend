@@ -55,7 +55,7 @@ describe('DashboardService', () => {
       produtoService.TotalProdutos.mockResolvedValue({
         totalProdutos: 150,
         totalEstoque: 2500,
-        valorEstoque: 1554.80,
+        valorEstoque: 1554.8,
       });
       produtoService.estoqueBaixoTotal.mockResolvedValue(3);
       produtoService.estoqueBaixoDash.mockResolvedValue([
@@ -65,7 +65,10 @@ describe('DashboardService', () => {
       categoriaRepository.graficoBarras.mockResolvedValue([
         { nome: 'Alimentos', total: 500 },
       ]);
-      movimentacaoService.movimentacoesHoje.mockResolvedValue({ entradas: 8, saidas: 8 });
+      movimentacaoService.movimentacoesHoje.mockResolvedValue({
+        entradas: 8,
+        saidas: 8,
+      });
       movimentacaoService.produtoMaisVendidos.mockResolvedValue([
         { nome: 'Ração Premium', quantidadeVendida: 120 },
       ]);
@@ -75,7 +78,7 @@ describe('DashboardService', () => {
       expect(result).toEqual({
         produtosCadastrados: 150,
         estoqueTotal: 2500,
-        valorEmEstoque: 1554.80,
+        valorEmEstoque: 1554.8,
         baixoEstoque: 3,
         baixoEstoqueResumo: [{ nome: 'Ração Premium', quantidade: 0 }],
         movimentacaoHoje: { entradas: 8, saidas: 8 },
@@ -86,12 +89,19 @@ describe('DashboardService', () => {
     });
 
     it('deve chamar todos os métodos do dashboard uma vez', async () => {
-      produtoService.TotalProdutos.mockResolvedValue({ totalProdutos: 0, totalEstoque: 0, valorEstoque: 0 });
+      produtoService.TotalProdutos.mockResolvedValue({
+        totalProdutos: 0,
+        totalEstoque: 0,
+        valorEstoque: 0,
+      });
       produtoService.estoqueBaixoTotal.mockResolvedValue(0);
       produtoService.estoqueBaixoDash.mockResolvedValue([]);
       categoriaRepository.categoriasCadastradas.mockResolvedValue(0);
       categoriaRepository.graficoBarras.mockResolvedValue([]);
-      movimentacaoService.movimentacoesHoje.mockResolvedValue({ entradas: 0, saidas: 0 });
+      movimentacaoService.movimentacoesHoje.mockResolvedValue({
+        entradas: 0,
+        saidas: 0,
+      });
       movimentacaoService.produtoMaisVendidos.mockResolvedValue([]);
 
       await service.dashboard();
@@ -99,7 +109,9 @@ describe('DashboardService', () => {
       expect(produtoService.TotalProdutos).toHaveBeenCalledTimes(1);
       expect(produtoService.estoqueBaixoTotal).toHaveBeenCalledTimes(1);
       expect(produtoService.estoqueBaixoDash).toHaveBeenCalledTimes(1);
-      expect(categoriaRepository.categoriasCadastradas).toHaveBeenCalledTimes(1);
+      expect(categoriaRepository.categoriasCadastradas).toHaveBeenCalledTimes(
+        1,
+      );
       expect(categoriaRepository.graficoBarras).toHaveBeenCalledTimes(1);
       expect(movimentacaoService.movimentacoesHoje).toHaveBeenCalledTimes(1);
       expect(movimentacaoService.produtoMaisVendidos).toHaveBeenCalledTimes(1);

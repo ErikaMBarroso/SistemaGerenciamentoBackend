@@ -58,37 +58,59 @@ describe('MovimentacaoService', () => {
 
     it('deve registrar entrada e somar na quantidade do produto', async () => {
       const produto = { produtoId: 1, quantidade: 10, ativo: true } as Produto;
-      const movimentacaoResultado = { id: 1, tipo: 'entrada', quantidade: 5 } as MovimentacaoEstoque;
+      const movimentacaoResultado = {
+        id: 1,
+        tipo: 'entrada',
+        quantidade: 5,
+      } as MovimentacaoEstoque;
 
       produtoRepository.achaPorId.mockResolvedValue(produto);
-      movimentacaoRepository.criaMovimentacao.mockResolvedValue(movimentacaoResultado);
+      movimentacaoRepository.criaMovimentacao.mockResolvedValue(
+        movimentacaoResultado,
+      );
 
       const result = await service.criaMovimentacao(dtoEntrada, 1);
 
       expect(produtoRepository.achaPorId).toHaveBeenCalledWith(1);
-      expect(produto.quantidade).toBe(15); 
-      expect(movimentacaoRepository.criaMovimentacao).toHaveBeenCalledWith(produto, dtoEntrada, 1);
+      expect(produto.quantidade).toBe(15);
+      expect(movimentacaoRepository.criaMovimentacao).toHaveBeenCalledWith(
+        produto,
+        dtoEntrada,
+        1,
+      );
       expect(result).toEqual(movimentacaoResultado);
     });
 
     it('deve registrar saída e subtrair da quantidade do produto', async () => {
       const produto = { produtoId: 1, quantidade: 10, ativo: true } as Produto;
-      const movimentacaoResultado = { id: 2, tipo: 'saida', quantidade: 5 } as MovimentacaoEstoque;
+      const movimentacaoResultado = {
+        id: 2,
+        tipo: 'saida',
+        quantidade: 5,
+      } as MovimentacaoEstoque;
 
       produtoRepository.achaPorId.mockResolvedValue(produto);
-      movimentacaoRepository.criaMovimentacao.mockResolvedValue(movimentacaoResultado);
+      movimentacaoRepository.criaMovimentacao.mockResolvedValue(
+        movimentacaoResultado,
+      );
 
       const result = await service.criaMovimentacao(dtoSaida, 1);
 
-      expect(produto.quantidade).toBe(5); 
-      expect(movimentacaoRepository.criaMovimentacao).toHaveBeenCalledWith(produto, dtoSaida, 1);
+      expect(produto.quantidade).toBe(5);
+      expect(movimentacaoRepository.criaMovimentacao).toHaveBeenCalledWith(
+        produto,
+        dtoSaida,
+        1,
+      );
       expect(result).toEqual(movimentacaoResultado);
     });
 
     it('deve lançar NotFoundException se produto não existir', async () => {
       produtoRepository.achaPorId.mockResolvedValue(null);
 
-      await expect(service.criaMovimentacao(dtoEntrada, 1)).rejects.toThrow(NotFoundException);
+      await expect(service.criaMovimentacao(dtoEntrada, 1)).rejects.toThrow(
+        NotFoundException,
+      );
       expect(movimentacaoRepository.criaMovimentacao).not.toHaveBeenCalled();
     });
 
@@ -96,7 +118,9 @@ describe('MovimentacaoService', () => {
       const produto = { produtoId: 1, quantidade: 10, ativo: false } as Produto;
       produtoRepository.achaPorId.mockResolvedValue(produto);
 
-      await expect(service.criaMovimentacao(dtoEntrada, 1)).rejects.toThrow(BadRequestException);
+      await expect(service.criaMovimentacao(dtoEntrada, 1)).rejects.toThrow(
+        BadRequestException,
+      );
       expect(movimentacaoRepository.criaMovimentacao).not.toHaveBeenCalled();
     });
 
@@ -104,8 +128,10 @@ describe('MovimentacaoService', () => {
       const produto = { produtoId: 1, quantidade: 3, ativo: true } as Produto;
       produtoRepository.achaPorId.mockResolvedValue(produto);
 
-      await expect(service.criaMovimentacao(dtoSaida, 1)).rejects.toThrow(BadRequestException);
-      expect(produto.quantidade).toBe(3); 
+      await expect(service.criaMovimentacao(dtoSaida, 1)).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(produto.quantidade).toBe(3);
       expect(movimentacaoRepository.criaMovimentacao).not.toHaveBeenCalled();
     });
   });
@@ -113,7 +139,9 @@ describe('MovimentacaoService', () => {
   describe('consultaMovimentacao', () => {
     it('deve retornar o resultado do repository', async () => {
       const dados = [{ nome: 'Ração', tipo: 'saida', total: 5 }];
-      movimentacaoRepository.consultaMovimentacao.mockResolvedValue(dados as any);
+      movimentacaoRepository.consultaMovimentacao.mockResolvedValue(
+        dados as any,
+      );
 
       const result = await service.consultaMovimentacao();
 
@@ -124,11 +152,15 @@ describe('MovimentacaoService', () => {
   describe('consultaMovimentacaoIndividual', () => {
     it('deve retornar movimentações de um produto específico', async () => {
       const dados = [{ id: 1, tipo: 'entrada' }] as MovimentacaoEstoque[];
-      movimentacaoRepository.consultaMovimentacaoIndividual.mockResolvedValue(dados);
+      movimentacaoRepository.consultaMovimentacaoIndividual.mockResolvedValue(
+        dados,
+      );
 
       const result = await service.consultaMovimentacaoIndividual(1);
 
-      expect(movimentacaoRepository.consultaMovimentacaoIndividual).toHaveBeenCalledWith(1);
+      expect(
+        movimentacaoRepository.consultaMovimentacaoIndividual,
+      ).toHaveBeenCalledWith(1);
       expect(result).toEqual(dados);
     });
   });
@@ -147,8 +179,13 @@ describe('MovimentacaoService', () => {
 
   describe('consultaMovimentacaoTotal', () => {
     it('deve retornar o total agrupado por tipo', async () => {
-      const dados = [{ tipo: 'entrada', total: 20 }, { tipo: 'saida', total: 15 }];
-      movimentacaoRepository.consultaMovimentacaoTotal.mockResolvedValue(dados as any);
+      const dados = [
+        { tipo: 'entrada', total: 20 },
+        { tipo: 'saida', total: 15 },
+      ];
+      movimentacaoRepository.consultaMovimentacaoTotal.mockResolvedValue(
+        dados as any,
+      );
 
       const result = await service.consultaMovimentacaoTotal();
 
@@ -169,7 +206,9 @@ describe('MovimentacaoService', () => {
 
   describe('estoqueBaixo', () => {
     it('deve retornar produtos com estoque baixo', async () => {
-      const dados = [{ produtoId: 1, nome: 'Ração', quantidade: 2 }] as Produto[];
+      const dados = [
+        { produtoId: 1, nome: 'Ração', quantidade: 2 },
+      ] as Produto[];
       produtoRepository.estoqueBaixo.mockResolvedValue(dados);
 
       const result = await service.estoqueBaixo();
@@ -226,8 +265,10 @@ describe('MovimentacaoService', () => {
 
       const result = await service.graficoLinha('7dias');
 
-      expect(result).toHaveLength(1); 
-      expect(result[0]).toEqual(expect.objectContaining({ entrada: 0, saida: 0 }));
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual(
+        expect.objectContaining({ entrada: 0, saida: 0 }),
+      );
     });
 
     it('deve usar 30 dias como padrão', async () => {
@@ -236,7 +277,7 @@ describe('MovimentacaoService', () => {
       const result = await service.graficoLinha('periodo-invalido' as any);
 
       expect(movimentacaoRepository.graficoLinha).toHaveBeenCalledWith(30);
-      expect(result).toHaveLength(Math.ceil(30 / 7)); 
+      expect(result).toHaveLength(Math.ceil(30 / 7));
     });
   });
 });

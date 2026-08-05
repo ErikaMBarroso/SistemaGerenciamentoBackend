@@ -9,12 +9,9 @@ import { ProdutoRepository } from '../produtos/produto.repository';
 import { ProdutosModule } from '../produtos/produtos.module';
 
 @Module({
-  imports: [ TypeOrmModule.forFeature([
-    MovimentacaoEstoque,
-    
-  ]), ProdutosModule,],
+  imports: [TypeOrmModule.forFeature([MovimentacaoEstoque]), ProdutosModule],
   controllers: [MovimentacaoController],
-  providers: [MovimentacaoService,  MovimentacaoRepository],
-  exports:[MovimentacaoService],
+  providers: [MovimentacaoService, MovimentacaoRepository],
+  exports: [MovimentacaoService],
 })
 export class MovimentacaoModule {}

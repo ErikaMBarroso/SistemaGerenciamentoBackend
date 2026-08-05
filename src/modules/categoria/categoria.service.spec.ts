@@ -3,8 +3,11 @@ import { CategoriaService } from './categoria.service';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { CategoriaRepository } from './categoria.repository';
 import { Categoria } from './entities/categoria.entity';
-import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
-
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 
 describe('CategoriaService', () => {
   let service: CategoriaService;
@@ -12,7 +15,8 @@ describe('CategoriaService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [CategoriaService,
+      providers: [
+        CategoriaService,
         {
           provide: CategoriaRepository,
           useValue: {
@@ -24,7 +28,6 @@ describe('CategoriaService', () => {
             salvar: jest.fn(),
             deletaCategoria: jest.fn(),
             graficoBarras: jest.fn(),
-
           },
         },
       ],
@@ -38,10 +41,10 @@ describe('CategoriaService', () => {
     expect(service).toBeDefined();
   });
 
-describe('criaCategoria', () => {
+  describe('criaCategoria', () => {
     it('deve criar categoria com sucesso', async () => {
-      const dto = {nome: 'Ração'};
-      const categoriaCriada = {nome: 'ração'} as Categoria;
+      const dto = { nome: 'Ração' };
+      const categoriaCriada = { nome: 'ração' } as Categoria;
       const categoriaSalva = { categoriaId: 1, nome: 'Ração' } as Categoria;
 
       repository.buscaNome.mockResolvedValue(null);
@@ -54,14 +57,15 @@ describe('criaCategoria', () => {
       expect(repository.criar).toHaveBeenCalledWith(dto);
       expect(repository.salvar).toHaveBeenCalledWith(categoriaCriada);
       expect(result).toEqual(categoriaSalva);
-
     });
-    
-    it('deve lançar ConflictException se categoria já existe', async() =>{
-      const dto = {nome: 'Ração'};
-      repository.buscaNome.mockResolvedValue({nome: 'ração'} as Categoria);
 
-      await expect(service.criaCategoria(dto)).rejects.toThrow(ConflictException);
+    it('deve lançar ConflictException se categoria já existe', async () => {
+      const dto = { nome: 'Ração' };
+      repository.buscaNome.mockResolvedValue({ nome: 'ração' } as Categoria);
+
+      await expect(service.criaCategoria(dto)).rejects.toThrow(
+        ConflictException,
+      );
       expect(repository.criar).not.toHaveBeenCalled();
       expect(repository.salvar).not.toHaveBeenCalled();
     });
@@ -69,7 +73,7 @@ describe('criaCategoria', () => {
 
   describe('consultaCategoria', () => {
     it('deve retornar lista de categorias', async () => {
-      const categorias = [{categoriaId: 1, nome: 'Ração' }] as Categoria[];
+      const categorias = [{ categoriaId: 1, nome: 'Ração' }] as Categoria[];
       repository.todos.mockResolvedValue(categorias);
 
       const result = await service.consultaCategoria();
@@ -93,7 +97,9 @@ describe('criaCategoria', () => {
     it('deve lançar NotFoundException se categoria não existir', async () => {
       repository.buscaPorId.mockResolvedValue(null);
 
-      await expect(service.consultaUnicaCategoria(999)).rejects.toThrow(NotFoundException);
+      await expect(service.consultaUnicaCategoria(999)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -108,29 +114,32 @@ describe('criaCategoria', () => {
   });
 
   describe('graficoBarras', () => {
-     it('deve retornar os dados agregados por categoria', async () => {
-
+    it('deve retornar os dados agregados por categoria', async () => {
       const dados = [
-        { nome: 'Alimentos', total: 100},
-        { nome: 'Higiene', total: 50},];
+        { nome: 'Alimentos', total: 100 },
+        { nome: 'Higiene', total: 50 },
+      ];
 
-        repository.graficoBarras.mockResolvedValue(dados);
+      repository.graficoBarras.mockResolvedValue(dados);
 
-        const result = await service.graficoBarras();
+      const result = await service.graficoBarras();
 
-         expect(repository.graficoBarras).toHaveBeenCalled();
-         expect(result).toEqual(dados);
-         });
-          });
+      expect(repository.graficoBarras).toHaveBeenCalled();
+      expect(result).toEqual(dados);
+    });
+  });
 
   describe('atualizaCategoria', () => {
     it('deve atualizar categoria com sucesso', async () => {
       const categoriaExistente = { categoriaId: 1, nome: 'Ração' } as Categoria;
       const dto = { nome: 'Ração Premium' };
-      const categoriaAtualizada = { categoriaId: 1, nome: 'Ração Premium' } as Categoria;
+      const categoriaAtualizada = {
+        categoriaId: 1,
+        nome: 'Ração Premium',
+      } as Categoria;
 
-      repository.buscaPorId.mockResolvedValue(categoriaExistente); 
-      repository.buscaNome.mockResolvedValue(null); 
+      repository.buscaPorId.mockResolvedValue(categoriaExistente);
+      repository.buscaNome.mockResolvedValue(null);
       repository.salvar.mockResolvedValue(categoriaAtualizada);
 
       const result = await service.atualizaCategoria(1, dto);
@@ -139,14 +148,19 @@ describe('criaCategoria', () => {
       expect(result).toEqual(categoriaAtualizada);
     });
 
-        it('deve lançar ConflictException se o novo nome já existir em outra categoria', async () => {
+    it('deve lançar ConflictException se o novo nome já existir em outra categoria', async () => {
       const categoriaExistente = { categoriaId: 1, nome: 'Ração' } as Categoria;
       const dto = { nome: 'Areia' };
 
       repository.buscaPorId.mockResolvedValue(categoriaExistente);
-      repository.buscaNome.mockResolvedValue({ categoriaId: 2, nome: 'Areia' } as Categoria);
+      repository.buscaNome.mockResolvedValue({
+        categoriaId: 2,
+        nome: 'Areia',
+      } as Categoria);
 
-      await expect(service.atualizaCategoria(1, dto)).rejects.toThrow(ConflictException);
+      await expect(service.atualizaCategoria(1, dto)).rejects.toThrow(
+        ConflictException,
+      );
       expect(repository.salvar).not.toHaveBeenCalled();
     });
     it('não deve checar duplicidade se o nome não mudou', async () => {
@@ -161,9 +175,13 @@ describe('criaCategoria', () => {
       expect(repository.buscaNome).not.toHaveBeenCalled();
     });
   });
-   describe('deletaCategoria', () => {
+  describe('deletaCategoria', () => {
     it('deve remover categoria sem produtos vinculados', async () => {
-      const categoria = { categoriaId: 1, nome: 'Ração', produtos: [] } as Categoria;
+      const categoria = {
+        categoriaId: 1,
+        nome: 'Ração',
+        produtos: [],
+      } as Categoria;
       repository.buscaPorId.mockResolvedValue(categoria);
 
       const result = await service.deletaCategoria(1);
@@ -172,14 +190,18 @@ describe('criaCategoria', () => {
       expect(result).toEqual({ mensagem: 'categoria removida' });
     });
 
-    
     it('deve lançar BadRequestException se categoria tiver produtos vinculados', async () => {
-      const categoria = {categoriaId: 1, nome: 'Ração', produtos: [{ produtoId: 1 }],
+      const categoria = {
+        categoriaId: 1,
+        nome: 'Ração',
+        produtos: [{ produtoId: 1 }],
       } as Categoria;
       repository.buscaPorId.mockResolvedValue(categoria);
 
-      await expect(service.deletaCategoria(1)).rejects.toThrow(BadRequestException);
+      await expect(service.deletaCategoria(1)).rejects.toThrow(
+        BadRequestException,
+      );
       expect(repository.deletaCategoria).not.toHaveBeenCalled();
     });
-    });
   });
+});

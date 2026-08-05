@@ -1,4 +1,4 @@
-import { CriaProduto } from "./criaProduto.dto";
-import { PartialType } from "@nestjs/swagger";
+import { CriaProduto } from './criaProduto.dto';
+import { PartialType } from '@nestjs/swagger';
 
-export class AtualizaProduto extends PartialType(CriaProduto){}
+export class AtualizaProduto extends PartialType(CriaProduto) {}

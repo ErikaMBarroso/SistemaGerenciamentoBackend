@@ -1,208 +1,215 @@
-import { BadRequestException, HttpException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MovimentacaoEstoque } from './entities/movimentacao.entity';
 import { Repository } from 'typeorm';
 import { Produto } from '../produtos/entities/produto.entity';
-import {TotalPorTipo} from './interface/interfaceTipo';
+import { TotalPorTipo } from './interface/interfaceTipo';
 import { TotalPorNome } from './interface/interfaceNome';
 import { MovimentacaoDto } from './dto/movimentacao.dto';
 import { MovimentacaoRepository } from './movimentacao.repository';
 import { ProdutoRepository } from '../produtos/produto.repository';
 @Injectable()
 export class MovimentacaoService {
-    constructor(
+  constructor(
+    private readonly movimentacaoRepository: MovimentacaoRepository,
 
-        private readonly movimentacaoRepository: MovimentacaoRepository,
+    private readonly produtoRepository: ProdutoRepository,
+  ) {}
 
-        private readonly produtoRepository: ProdutoRepository,
-    ){}
+  async criaMovimentacao(
+    dto: MovimentacaoDto,
+    usuarioId: number,
+  ): Promise<MovimentacaoEstoque> {
+    try {
+      const produto = await this.produtoRepository.achaPorId(dto.produtoId);
+      if (!produto) {
+        throw new NotFoundException('Produto não encontrado');
+      }
+      if (!produto.ativo) {
+        throw new BadRequestException('Porduto já está desativo');
+      }
 
-    async criaMovimentacao(dto: MovimentacaoDto, usuarioId: number): Promise<MovimentacaoEstoque>{
-        try{
-            const produto = await this.produtoRepository.achaPorId(dto.produtoId);
-            if (!produto){
-                throw new NotFoundException('Produto não encontrado');
-            }
-            if (!produto.ativo){
-                throw new BadRequestException('Porduto já está desativo');
-            }
-
-            if ( dto.tipo === 'saida'){
-                if(produto.quantidade < dto.quantidade){
-                    throw new BadRequestException(
-                        `Estoque insuficiente. Disponivel: ${produto.quantidade}`
-                    );
-                }
-                
-                produto.quantidade -= dto.quantidade;
-            } else {
-                produto.quantidade += dto.quantidade;
-            }
-
-            return await this.movimentacaoRepository.criaMovimentacao(
-                produto, dto, usuarioId,);
-            
-            
+      if (dto.tipo === 'saida') {
+        if (produto.quantidade < dto.quantidade) {
+          throw new BadRequestException(
+            `Estoque insuficiente. Disponivel: ${produto.quantidade}`,
+          );
         }
-        catch(error){
-            if (error instanceof HttpException) throw error;
-            throw new InternalServerErrorException('Erro ao registrar movimentação');
-        }
-        
+
+        produto.quantidade -= dto.quantidade;
+      } else {
+        produto.quantidade += dto.quantidade;
+      }
+
+      return await this.movimentacaoRepository.criaMovimentacao(
+        produto,
+        dto,
+        usuarioId,
+      );
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('Erro ao registrar movimentação');
     }
+  }
 
-    async consultaMovimentacao(): Promise<TotalPorTipo[]>{
-        try{ return this.movimentacaoRepository.consultaMovimentacao()
-            
-
-        }catch(error){
-            console.log(error);
-            if (error instanceof HttpException) throw error;
-            throw new InternalServerErrorException('Erro ao buscar movimentacao');
-        }
+  async consultaMovimentacao(): Promise<TotalPorTipo[]> {
+    try {
+      return this.movimentacaoRepository.consultaMovimentacao();
+    } catch (error) {
+      console.log(error);
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('Erro ao buscar movimentacao');
     }
+  }
 
-    async consultaMovimentacaoIndividual(produtoId: number): Promise<MovimentacaoEstoque[]>{
-        try{ return  this.movimentacaoRepository.consultaMovimentacaoIndividual(produtoId);
-
-        }catch(error){
-            console.log(error);
-            if (error instanceof HttpException) throw error;
-            throw new InternalServerErrorException('Erro ao buscar movimentacao');
-        }
+  async consultaMovimentacaoIndividual(
+    produtoId: number,
+  ): Promise<MovimentacaoEstoque[]> {
+    try {
+      return this.movimentacaoRepository.consultaMovimentacaoIndividual(
+        produtoId,
+      );
+    } catch (error) {
+      console.log(error);
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('Erro ao buscar movimentacao');
     }
+  }
 
-        async estoqueQuantidadeAtual(): Promise <TotalPorNome[]>{
-        try{
-            return this.produtoRepository.estoqueQuantidadeAtual()
-            
-            
-        } catch(error){
-            if (error instanceof HttpException) throw error;
-            throw new InternalServerErrorException('Erro ao buscar produto');
-        }
+  async estoqueQuantidadeAtual(): Promise<TotalPorNome[]> {
+    try {
+      return this.produtoRepository.estoqueQuantidadeAtual();
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('Erro ao buscar produto');
     }
-    async consultaMovimentacaoTotal(): Promise<TotalPorTipo[]>{ 
-        try{ return this.movimentacaoRepository.consultaMovimentacaoTotal(); 
-
-
-        }catch(error){ 
-        console.log(error);
-        if (error instanceof HttpException) 
-            throw error; throw new InternalServerErrorException('Erro ao buscar toral'); }}
-
-
-    async historicoMovimentacao(): Promise<MovimentacaoEstoque[]>{
-        try{
-            return  this.movimentacaoRepository.historicoMovimentacao()
-
-        }catch (error) {
-            console.log(error);
-            if (error instanceof HttpException) throw error;
-            throw new InternalServerErrorException('Erro ao buscar histórico de movimentação');
-        }
+  }
+  async consultaMovimentacaoTotal(): Promise<TotalPorTipo[]> {
+    try {
+      return this.movimentacaoRepository.consultaMovimentacaoTotal();
+    } catch (error) {
+      console.log(error);
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('Erro ao buscar toral');
     }
+  }
 
-    async estoqueBaixo(): Promise<Produto[]>{
-        try{
-            return  this.produtoRepository.estoqueBaixo()
-            
-
-        }catch (error) {
-            if (error instanceof HttpException) throw error;
-            throw new InternalServerErrorException('Erro ao buscar estoque baixo');
-        }
-    
+  async historicoMovimentacao(): Promise<MovimentacaoEstoque[]> {
+    try {
+      return this.movimentacaoRepository.historicoMovimentacao();
+    } catch (error) {
+      console.log(error);
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException(
+        'Erro ao buscar histórico de movimentação',
+      );
     }
+  }
 
-    async movimentacoesHoje(){
-        try{
-            return await this.movimentacaoRepository.movimentacaoHoje();
-        }
-        catch (error) {
-            if (error instanceof HttpException) throw error;
-            throw new InternalServerErrorException('Erro ao buscar movimentação de hoje');
-        }
+  async estoqueBaixo(): Promise<Produto[]> {
+    try {
+      return this.produtoRepository.estoqueBaixo();
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('Erro ao buscar estoque baixo');
     }
+  }
 
-
-    async semMovimentacao(dias: number): Promise<Produto[]>{
-        try{
-            return this.produtoRepository.semMovimentacao(dias);
-
-        }catch (error) {
-            if (error instanceof HttpException) throw error;
-            throw new InternalServerErrorException('Erro ao buscar produto sem movimentação');
-        }
+  async movimentacoesHoje() {
+    try {
+      return await this.movimentacaoRepository.movimentacaoHoje();
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException(
+        'Erro ao buscar movimentação de hoje',
+      );
     }
+  }
 
-    async produtoMaisVendidos(){
-        try{
-            return await this.movimentacaoRepository.produtoMaisVendidos();
-        }
-        catch(error){
-        if (error instanceof HttpException) throw error;
-            throw new InternalServerErrorException('Erro ao buscar produto mais vendido');
+  async semMovimentacao(dias: number): Promise<Produto[]> {
+    try {
+      return this.produtoRepository.semMovimentacao(dias);
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException(
+        'Erro ao buscar produto sem movimentação',
+      );
     }
+  }
+
+  async produtoMaisVendidos() {
+    try {
+      return await this.movimentacaoRepository.produtoMaisVendidos();
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException(
+        'Erro ao buscar produto mais vendido',
+      );
     }
+  }
 
-    async graficoLinha(periodo: string = '30dias'){
-        try{
-            const dias = this.periodoDias(periodo);
-            const dado = await this.movimentacaoRepository.graficoLinha(dias)
-         
-            const totalSemanas = Math.ceil(dias/7);
-            
-            const hoje = new Date();
-            const eixoSemanas: {chave: string; label: string}[] = [];
-            
+  async graficoLinha(periodo: string = '30dias') {
+    try {
+      const dias = this.periodoDias(periodo);
+      const dado = await this.movimentacaoRepository.graficoLinha(dias);
 
-            for(let i =totalSemanas -1; i>=0; i--){
-                const data = new Date(hoje);
-                data.setDate(data.getDate() - i * 7);
-                const inicio = this.inicioDaSemana(data);
-                const chave = inicio.toISOString();
-                const label = inicio.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'})
-                eixoSemanas.push({ chave, label});
-            }
+      const totalSemanas = Math.ceil(dias / 7);
 
-            const mapa = new Map<string, number>();
-            for ( const linha of dado){
-                 const chave = `${new Date(linha.periodo).toISOString()}|${linha.tipo}`;
-                mapa.set(chave, Number(linha.total));
-            }
-           
+      const hoje = new Date();
+      const eixoSemanas: { chave: string; label: string }[] = [];
 
-            return eixoSemanas.map(({ chave, label}) =>({
-                semana: label,
-                entrada: mapa.get(`${chave}|entrada`) ?? 0,
-                saida: mapa.get(`${chave}|saida`) ?? 0,
-            }));
-        }catch (error) {
-            if (error instanceof HttpException) throw error;
-            throw new InternalServerErrorException('Erro ao buscar fluxo da movimentação');
-        }
-    
-    }   
-    private inicioDaSemana(data: Date): Date{
-        const d = new Date(data);
-        const dia = d.getDay();
-        const diff = d.getDate() - dia + (dia === 0 ? -6 : 1);
-        d.setDate(diff);
-        d.setHours(0, 0, 0, 0);
-        return d
+      for (let i = totalSemanas - 1; i >= 0; i--) {
+        const data = new Date(hoje);
+        data.setDate(data.getDate() - i * 7);
+        const inicio = this.inicioDaSemana(data);
+        const chave = inicio.toISOString();
+        const label = inicio.toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+        });
+        eixoSemanas.push({ chave, label });
+      }
+
+      const mapa = new Map<string, number>();
+      for (const linha of dado) {
+        const chave = `${new Date(linha.periodo).toISOString()}|${linha.tipo}`;
+        mapa.set(chave, Number(linha.total));
+      }
+
+      return eixoSemanas.map(({ chave, label }) => ({
+        semana: label,
+        entrada: mapa.get(`${chave}|entrada`) ?? 0,
+        saida: mapa.get(`${chave}|saida`) ?? 0,
+      }));
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException(
+        'Erro ao buscar fluxo da movimentação',
+      );
     }
-    private periodoDias(periodo): number {
-        const mapa: Record<string, number> ={
-        '7dias': 7,
-        '30dias': 30,
-        '3meses': 90,
-        '1ano': 365,
-
-        }
-    
-    return mapa[periodo]?? 30;
+  }
+  private inicioDaSemana(data: Date): Date {
+    const d = new Date(data);
+    const dia = d.getDay();
+    const diff = d.getDate() - dia + (dia === 0 ? -6 : 1);
+    d.setDate(diff);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+  private periodoDias(periodo): number {
+    const mapa: Record<string, number> = {
+      '7dias': 7,
+      '30dias': 30,
+      '3meses': 90,
+      '1ano': 365,
     };
 
-
+    return mapa[periodo] ?? 30;
+  }
 }

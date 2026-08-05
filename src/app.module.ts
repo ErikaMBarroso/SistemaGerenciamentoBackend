@@ -14,14 +14,13 @@ import { CategoriaModule } from './modules/categoria/categoria.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
 
-    ThrottlerModule.forRoot([{ttl: 60_000, limit: 5,},]),
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 5 }]),
 
     DatabaseModule,
     UserModule,

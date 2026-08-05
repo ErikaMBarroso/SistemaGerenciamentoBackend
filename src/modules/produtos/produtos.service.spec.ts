@@ -34,7 +34,7 @@ describe('ProdutosService', () => {
           },
         },
         {
-          provide: getRepositoryToken(Categoria), 
+          provide: getRepositoryToken(Categoria),
           useValue: {
             findOne: jest.fn(),
           },
@@ -72,14 +72,21 @@ describe('ProdutosService', () => {
 
       const result = await service.criar(dto, 1);
 
-      expect(produtoRepository.buscaPorNome).toHaveBeenCalledWith(dto.nome, dto.marca);
-      expect(categoriaRepository.findOne).toHaveBeenCalledWith({ where: { categoriaId: dto.categoriaId } });
+      expect(produtoRepository.buscaPorNome).toHaveBeenCalledWith(
+        dto.nome,
+        dto.marca,
+      );
+      expect(categoriaRepository.findOne).toHaveBeenCalledWith({
+        where: { categoriaId: dto.categoriaId },
+      });
       expect(produtoRepository.criarProduto).toHaveBeenCalledWith(dto, 1);
       expect(result).toEqual(produtoSalvo);
     });
 
     it('deve lançar ConflictException se produto já existe', async () => {
-      produtoRepository.buscaPorNome.mockResolvedValue({ nome: 'Ração' } as Produto);
+      produtoRepository.buscaPorNome.mockResolvedValue({
+        nome: 'Ração',
+      } as Produto);
 
       await expect(service.criar(dto, 1)).rejects.toThrow(ConflictException);
       expect(categoriaRepository.findOne).not.toHaveBeenCalled();
@@ -127,13 +134,19 @@ describe('ProdutosService', () => {
     it('deve lançar NotFoundException se produto não existir', async () => {
       produtoRepository.achaPorId.mockResolvedValue(null);
 
-      await expect(service.consultaUnica(999)).rejects.toThrow(NotFoundException);
+      await expect(service.consultaUnica(999)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
   describe('TotalProdutos', () => {
     it('deve retornar os indicadores gerais', async () => {
-      const indicadores = { totalProdutos: 7, totalEstoque: 52, valorEstoque: 700 };
+      const indicadores = {
+        totalProdutos: 7,
+        totalEstoque: 52,
+        valorEstoque: 700,
+      };
       produtoRepository.TotalProdutos.mockResolvedValue(indicadores);
 
       const result = await service.TotalProdutos();
@@ -165,9 +178,16 @@ describe('ProdutosService', () => {
 
   describe('atualizar', () => {
     it('deve atualizar produto com sucesso', async () => {
-      const produtoExistente = { produtoId: 1, nome: 'Ração', categoriaId: 1 } as Produto;
+      const produtoExistente = {
+        produtoId: 1,
+        nome: 'Ração',
+        categoriaId: 1,
+      } as Produto;
       const dto = { nome: 'Ração Premium' } as any;
-      const produtoAtualizado = { produtoId: 1, nome: 'Ração Premium' } as Produto;
+      const produtoAtualizado = {
+        produtoId: 1,
+        nome: 'Ração Premium',
+      } as Produto;
 
       produtoRepository.achaPorId.mockResolvedValue(produtoExistente); // usado dentro de consultaUnica
       produtoRepository.buscaPorNome.mockResolvedValue(null);
@@ -175,7 +195,9 @@ describe('ProdutosService', () => {
 
       const result = await service.atualizar(1, dto);
 
-      expect(produtoRepository.buscaPorNome).toHaveBeenCalledWith('Ração Premium');
+      expect(produtoRepository.buscaPorNome).toHaveBeenCalledWith(
+        'Ração Premium',
+      );
       expect(result).toEqual(produtoAtualizado);
     });
 
@@ -184,27 +206,42 @@ describe('ProdutosService', () => {
       const dto = { nome: 'Areia' } as any;
 
       produtoRepository.achaPorId.mockResolvedValue(produtoExistente);
-      produtoRepository.buscaPorNome.mockResolvedValue({ produtoId: 2, nome: 'Areia' } as Produto);
+      produtoRepository.buscaPorNome.mockResolvedValue({
+        produtoId: 2,
+        nome: 'Areia',
+      } as Produto);
 
-      await expect(service.atualizar(1, dto)).rejects.toThrow(ConflictException);
+      await expect(service.atualizar(1, dto)).rejects.toThrow(
+        ConflictException,
+      );
       expect(produtoRepository.salvar).not.toHaveBeenCalled();
     });
 
     it('deve lançar NotFoundException se a nova categoria não existir', async () => {
-      const produtoExistente = { produtoId: 1, nome: 'Ração', categoriaId: 1 } as Produto;
+      const produtoExistente = {
+        produtoId: 1,
+        nome: 'Ração',
+        categoriaId: 1,
+      } as Produto;
       const dto = { categoriaId: 99 } as any;
 
       produtoRepository.achaPorId.mockResolvedValue(produtoExistente);
       categoriaRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.atualizar(1, dto)).rejects.toThrow(NotFoundException);
+      await expect(service.atualizar(1, dto)).rejects.toThrow(
+        NotFoundException,
+      );
       expect(produtoRepository.salvar).not.toHaveBeenCalled();
     });
   });
 
   describe('deleta', () => {
     it('deve chamar deletarProduto e retornar a mensagem do repository', async () => {
-      const produto = { produtoId: 1, nome: 'comida', quantidade: 10 } as Produto;
+      const produto = {
+        produtoId: 1,
+        nome: 'comida',
+        quantidade: 10,
+      } as Produto;
       const resposta = { mensagem: 'O estoque foi zerado' };
 
       produtoRepository.achaPorId.mockResolvedValue(produto);

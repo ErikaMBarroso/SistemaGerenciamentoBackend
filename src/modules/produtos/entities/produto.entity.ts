@@ -1,46 +1,56 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Categoria } from "../../categoria/entities/categoria.entity";
-import { Exclude } from "class-transformer";
-import { MovimentacaoEstoque } from "../../movimentacao/entities/movimentacao.entity";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Categoria } from '../../categoria/entities/categoria.entity';
+import { Exclude } from 'class-transformer';
+import { MovimentacaoEstoque } from '../../movimentacao/entities/movimentacao.entity';
 @Entity('produtos')
+export class Produto {
+  @PrimaryGeneratedColumn({ name: 'produto_id' })
+  produtoId!: number;
 
-export class Produto{
-    @PrimaryGeneratedColumn({name: 'produto_id'})
-    produtoId!: number;
+  @Column({ length: 100 })
+  nome!: string;
 
-    @Column({ length: 100})
-    nome!: string;
+  @Column({ type: 'text' })
+  descricao!: string;
 
-    @Column({type: 'text'})
-    descricao!: string;
+  @Column({ length: 100 })
+  marca!: string;
 
-    @Column({ length: 100})
-    marca!: string;
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => Number(value),
+    },
+  })
+  preco!: number;
 
-    @Column({ type: 'decimal', precision: 10, scale: 2, transformer: {
-    to: (value: number) => value,
-    from: (value: string) => Number(value),},})
-    preco!: number;
+  @Column({ default: 0 })
+  quantidade!: number;
 
-    @Column({ default: 0})
-    quantidade!: number;
+  @Column({ name: 'quantidade_min', default: 5 })
+  quantidadeMin!: number;
 
-    @Column({name: 'quantidade_min', default: 5})
-    quantidadeMin!: number;
+  @ManyToOne(() => Categoria, (categoria) => categoria.produtos)
+  @JoinColumn({ name: 'categoria_id' })
+  categoria!: Categoria;
 
-    @ManyToOne(() => Categoria, (categoria) => categoria.produtos)
-    @JoinColumn({ name: 'categoria_id'})
-    categoria!: Categoria;
+  @Exclude()
+  @Column({ name: 'categoria_id' })
+  categoriaId!: number;
 
-    @Exclude()
-    @Column({  name: 'categoria_id'})
-    categoriaId!: number;
+  @Column({ default: true })
+  ativo!: boolean;
 
-    @Column({ default: true })
-    ativo!: boolean;
-
-    @OneToMany(() => MovimentacaoEstoque, (movimentacao) => movimentacao.produto)
-    movimentacao!: MovimentacaoEstoque[];
-
-
+  @OneToMany(() => MovimentacaoEstoque, (movimentacao) => movimentacao.produto)
+  movimentacao!: MovimentacaoEstoque[];
 }
