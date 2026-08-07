@@ -12,7 +12,7 @@ export class DashboardController {
 
   @Get('dashboard')
   @ApiOperation({
-    summary: 'Apresenta dados relativos aos cards e gráficoos do dashboard',
+    summary: 'Apresenta dados relativos aos cards e gráficos do dashboard',
   })
   resumo() {
     return this.dashboardService.dashboard();
