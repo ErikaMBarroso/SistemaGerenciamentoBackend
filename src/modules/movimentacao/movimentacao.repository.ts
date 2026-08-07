@@ -148,7 +148,7 @@ export class MovimentacaoRepository {
 
     const resultado = await this.repository
       .createQueryBuilder('m')
-      .select(`date_trunc('week', m.dataMovimentacao)`, 'periodo')
+      .select(`date_trunc('day', m.dataMovimentacao)`, 'periodo')
       .addSelect('m.tipo', 'tipo')
       .addSelect('SUM(m.quantidade)', 'total')
       .where('m.dataMovimentacao >= :dataInicio', { dataInicio })
