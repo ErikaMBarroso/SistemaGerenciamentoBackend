@@ -5,15 +5,15 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+
 import { MovimentacaoEstoque } from './entities/movimentacao.entity';
-import { Repository } from 'typeorm';
 import { Produto } from '../produtos/entities/produto.entity';
 import { TotalPorTipo } from './interface/interfaceTipo';
 import { TotalPorNome } from './interface/interfaceNome';
 import { MovimentacaoDto } from './dto/movimentacao.dto';
 import { MovimentacaoRepository } from './movimentacao.repository';
 import { ProdutoRepository } from '../produtos/produto.repository';
+import { OpcaoData } from './interface/interfaceData';
 @Injectable()
 export class MovimentacaoService {
   constructor(
@@ -157,7 +157,7 @@ export class MovimentacaoService {
   async graficoLinha(periodo: string = '30dias') {
     try {
       const dias = this.periodoDias(periodo);
-
+      const opcaoPeriodo = this.opcaoPeriodo(periodo);
       const dado = await this.movimentacaoRepository.graficoLinha(dias);
 
       const hoje = new Date();
@@ -166,7 +166,7 @@ export class MovimentacaoService {
       for (let i = dias - 1; i >= 0; i--) {
         const data = new Date(hoje);
         data.setDate(data.getDate() - i);
-        const inicio = this.inicioDoDia(data);
+        const inicio = this.inicioDoDia(data, opcaoPeriodo);
         const chave = inicio.toISOString();
         const label = inicio.toLocaleDateString('pt-BR', {
           day: '2-digit',
@@ -194,11 +194,29 @@ export class MovimentacaoService {
       );
     }
   }
-  private inicioDoDia(data: Date): Date {
+  private opcaoPeriodo(periodo: string): OpcaoData {
+    if (periodo === '3meses') return 'semana';
+    if (periodo === '1ano') return 'mes';
+    return 'dia';
+  }
+  private inicioDoDia(data: Date, opcaoPeriodo: OpcaoData): Date {
     const d = new Date(data);
 
     d.setHours(0, 0, 0, 0);
+    if (opcaoPeriodo === 'semana') {
+      const dia = d.getDay();
+      const diaInicio = d.getDate() - dia + (dia === 0 ? -6 : 1);
+      d.setDate(diaInicio);
+    } else if (opcaoPeriodo === 'mes') {
+      d.setDate(1);
+    }
     return d;
+  }
+  private labelBucket(d: Date, opcaoPeriodo: OpcaoData): string {
+    if (opcaoPeriodo === 'mes') {
+      return d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
+    }
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', year: '2-digit' });
   }
   private periodoDias(periodo): number {
     const mapa: Record<string, number> = {
