@@ -161,28 +161,30 @@ export class MovimentacaoService {
       const dado = await this.movimentacaoRepository.graficoLinha(dias);
 
       const hoje = new Date();
-      const eixoDias: { chave: string; label: string }[] = [];
 
+      const eixo = new Map<string, string>();
       for (let i = dias - 1; i >= 0; i--) {
         const data = new Date(hoje);
         data.setDate(data.getDate() - i);
         const inicio = this.inicioDoDia(data, opcaoPeriodo);
-        const chave = inicio.toISOString();
-        const label = inicio.toLocaleDateString('pt-BR', {
-          day: '2-digit',
-          month: '2-digit',
-        });
-        eixoDias.push({ chave, label });
+        const chave = this.formataData(inicio);
+        if (!eixo.has(chave)) {
+          eixo.set(chave, this.labelData(inicio, opcaoPeriodo));
+        }
       }
 
       const mapa = new Map<string, number>();
       for (const linha of dado) {
-        const chave = `${new Date(linha.periodo).toISOString()}|${linha.tipo}`;
-        mapa.set(chave, Number(linha.total));
+        const inicio = this.inicioDoDia(new Date(linha.periodo), opcaoPeriodo);
+
+        const chave = `${this.formataData(inicio)}|${linha.tipo}`;
+
+        const atual = mapa.get(chave) ?? 0;
+        mapa.set(chave, atual + Number(linha.total));
       }
 
-      return eixoDias.map(({ chave, label }) => ({
-        dia: label,
+      return Array.from(eixo, ([chave, label]) => ({
+        data: label,
         entrada: mapa.get(`${chave}|entrada`) ?? 0,
         saida: mapa.get(`${chave}|saida`) ?? 0,
       }));
@@ -212,7 +214,13 @@ export class MovimentacaoService {
     }
     return d;
   }
-  private labelBucket(d: Date, opcaoPeriodo: OpcaoData): string {
+  private formataData(d: Date): string {
+    const ano = d.getFullYear();
+    const mes = String(d.getMonth() + 1).padStart(2, '0');
+    const dia = String(d.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+  }
+  private labelData(d: Date, opcaoPeriodo: OpcaoData): string {
     if (opcaoPeriodo === 'mes') {
       return d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
     }
