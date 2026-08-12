@@ -65,20 +65,6 @@ export class ProdutoRepository {
     });
   }
 
-  // todos(){
-  //     return this.repository.find({
-  //         where:{
-  //             ativo: true
-  //         },
-  //         relations:{
-  //             categoria: true
-  //         },
-  //         order:{
-  //             nome: 'ASC'
-  //         }
-  //     });
-  // }
-
   async listaProdutos(filtro: ConsultaProduto) {
     const {
       pesquisa,

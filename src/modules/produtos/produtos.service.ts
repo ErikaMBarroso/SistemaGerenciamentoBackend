@@ -49,14 +49,6 @@ export class ProdutosService {
     }
   }
 
-  // async consultaTodos(): Promise<Produto[]> {
-  //     try{
-  //        return await this.produtoRepository.todos();
-  //     } catch(error){
-  //         if (error instanceof HttpException) throw error;
-  //         throw new InternalServerErrorException('Erro ao buscar produtos');
-  //     }
-  // }
   async listar(filtro: ConsultaProduto) {
     try {
       return await this.produtoRepository.listaProdutos(filtro);

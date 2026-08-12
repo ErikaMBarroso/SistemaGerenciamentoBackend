@@ -33,7 +33,7 @@ export class ProdutosController {
   @ApiOperation({ summary: 'Cadastra Produto' })
   @Perfis('administrador')
   criar(@Body() dto: CriaProduto, @UsuarioLogado() UsuarioLogado: any) {
-    return this.produtoService.criar(dto, UsuarioLogado.sub);
+    return this.produtoService.criar(dto, UsuarioLogado.usuarioId);
   }
 
   @Get()
