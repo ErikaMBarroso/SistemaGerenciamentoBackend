@@ -33,15 +33,8 @@ export class ProdutosController {
   @ApiOperation({ summary: 'Cadastra Produto' })
   @Perfis('administrador')
   criar(@Body() dto: CriaProduto, @UsuarioLogado() UsuarioLogado: any) {
-    return this.produtoService.criar(dto, UsuarioLogado.usuarioId);
+    return this.produtoService.criar(dto, UsuarioLogado.sub);
   }
-
-  // @Get()
-  // @ApiOperation({ summary:'Consulta Produto' })
-  // @Perfis('administrador')
-  //     consultaTodos(){
-  //         return this.produtoService.consultaTodos();
-  //     }
 
   @Get()
   @ApiOperation({ summary: 'Lista Produtos' })
