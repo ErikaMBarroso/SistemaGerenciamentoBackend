@@ -33,7 +33,6 @@ export class MovimentacaoController {
     @UsuarioLogado()
     usuarioLogado: { usuarioId: number; nome: string; perfil: string },
   ) {
-    // console.log('Usuário logado:', usuarioLogado);
     return this.movimentacaoService.criaMovimentacao(
       dto,
       usuarioLogado.usuarioId,
