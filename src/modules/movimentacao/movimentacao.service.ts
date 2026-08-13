@@ -224,7 +224,7 @@ export class MovimentacaoService {
     if (opcaoPeriodo === 'mes') {
       return d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
     }
-    return d.toLocaleDateString('pt-BR', { day: '2-digit', year: '2-digit' });
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
   }
   private periodoDias(periodo): number {
     const mapa: Record<string, number> = {

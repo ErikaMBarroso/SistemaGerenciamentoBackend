@@ -16,6 +16,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UsuarioLogado } from '../../common/decorators/usuarioLogado.decorators';
 import { Perfis } from '../auth/auth.decorator';
 import { RolesGuard } from '../auth/role.guard';
+import { PeriodoGrafico } from './dto/movimentacaoGrafico.dto';
 
 @ApiTags('movimentacaos')
 @ApiBearerAuth()
@@ -83,8 +84,8 @@ export class MovimentacaoController {
 
   @Get('graficoLinha')
   @ApiOperation({ summary: 'Movimentações por período (gráfico de linha)' })
-  graficoLinha(@Query('periodo') periodo?: string) {
-    return this.movimentacaoService.graficoLinha(periodo);
+  graficoLinha(@Query() filtro: PeriodoGrafico) {
+    return this.movimentacaoService.graficoLinha(filtro.periodo);
   }
 
   @Get(':produtoId')
