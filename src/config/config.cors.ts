@@ -1,6 +1,7 @@
 export function corsConfig() {
-
-  return {origin: 'http://localhost:5173', credentials: true};
-
+  return {
+    origin: process.env.FRONTEND_URL,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    credentials: true,
+  };
 }
-
