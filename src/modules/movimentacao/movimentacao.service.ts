@@ -1,0 +1,234 @@
+import {
+  BadRequestException,
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+
+import { MovimentacaoEstoque } from './entities/movimentacao.entity';
+import { Produto } from '../produtos/entities/produto.entity';
+import { TotalPorTipo } from './interface/interfaceTipo';
+import { TotalPorNome } from './interface/interfaceNome';
+import { MovimentacaoDto } from './dto/movimentacao.dto';
+import { MovimentacaoRepository } from './movimentacao.repository';
+import { ProdutoRepository } from '../produtos/produto.repository';
+import { OpcaoData } from './interface/interfaceData';
+@Injectable()
+export class MovimentacaoService {
+  constructor(
+    private readonly movimentacaoRepository: MovimentacaoRepository,
+
+    private readonly produtoRepository: ProdutoRepository,
+  ) {}
+
+  async criaMovimentacao(
+    dto: MovimentacaoDto,
+    usuarioId: number,
+  ): Promise<MovimentacaoEstoque> {
+    try {
+      const produto = await this.produtoRepository.achaPorId(dto.produtoId);
+      if (!produto) {
+        throw new NotFoundException('Produto não encontrado');
+      }
+      if (!produto.ativo) {
+        throw new BadRequestException('Porduto já está desativo');
+      }
+
+      if (dto.tipo === 'saida') {
+        if (produto.quantidade < dto.quantidade) {
+          throw new BadRequestException(
+            `Estoque insuficiente. Disponivel: ${produto.quantidade}`,
+          );
+        }
+
+        produto.quantidade -= dto.quantidade;
+      } else {
+        produto.quantidade += dto.quantidade;
+      }
+
+      return await this.movimentacaoRepository.criaMovimentacao(
+        produto,
+        dto,
+        usuarioId,
+      );
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('Erro ao registrar movimentação');
+    }
+  }
+
+  async consultaMovimentacao(): Promise<TotalPorTipo[]> {
+    try {
+      return this.movimentacaoRepository.consultaMovimentacao();
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('Erro ao buscar movimentacao');
+    }
+  }
+
+  async consultaMovimentacaoIndividual(
+    produtoId: number,
+  ): Promise<MovimentacaoEstoque[]> {
+    try {
+      return this.movimentacaoRepository.consultaMovimentacaoIndividual(
+        produtoId,
+      );
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('Erro ao buscar movimentacao');
+    }
+  }
+
+  async estoqueQuantidadeAtual(): Promise<TotalPorNome[]> {
+    try {
+      return this.produtoRepository.estoqueQuantidadeAtual();
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('Erro ao buscar produto');
+    }
+  }
+  async consultaMovimentacaoTotal(): Promise<TotalPorTipo[]> {
+    try {
+      return this.movimentacaoRepository.consultaMovimentacaoTotal();
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('Erro ao buscar toral');
+    }
+  }
+
+  async historicoMovimentacao(): Promise<MovimentacaoEstoque[]> {
+    try {
+      return this.movimentacaoRepository.historicoMovimentacao();
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException(
+        'Erro ao buscar histórico de movimentação',
+      );
+    }
+  }
+
+  async estoqueBaixo(): Promise<Produto[]> {
+    try {
+      return this.produtoRepository.estoqueBaixo();
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException('Erro ao buscar estoque baixo');
+    }
+  }
+
+  async movimentacoesHoje() {
+    try {
+      return await this.movimentacaoRepository.movimentacaoHoje();
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException(
+        'Erro ao buscar movimentação de hoje',
+      );
+    }
+  }
+
+  async semMovimentacao(dias: number): Promise<Produto[]> {
+    try {
+      return this.produtoRepository.semMovimentacao(dias);
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException(
+        'Erro ao buscar produto sem movimentação',
+      );
+    }
+  }
+
+  async produtoMaisVendidos() {
+    try {
+      return await this.movimentacaoRepository.produtoMaisVendidos();
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException(
+        'Erro ao buscar produto mais vendido',
+      );
+    }
+  }
+
+  async graficoLinha(periodo: string = '30dias') {
+    try {
+      const dias = this.periodoDias(periodo);
+      const opcaoPeriodo = this.opcaoPeriodo(periodo);
+      const dado = await this.movimentacaoRepository.graficoLinha(dias);
+
+      const hoje = new Date();
+
+      const eixo = new Map<string, string>();
+      for (let i = dias - 1; i >= 0; i--) {
+        const data = new Date(hoje);
+        data.setDate(data.getDate() - i);
+        const inicio = this.inicioDoDia(data, opcaoPeriodo);
+        const chave = this.formataData(inicio);
+        if (!eixo.has(chave)) {
+          eixo.set(chave, this.labelData(inicio, opcaoPeriodo));
+        }
+      }
+
+      const mapa = new Map<string, number>();
+      for (const linha of dado) {
+        const inicio = this.inicioDoDia(new Date(linha.periodo), opcaoPeriodo);
+
+        const chave = `${this.formataData(inicio)}|${linha.tipo}`;
+
+        const atual = mapa.get(chave) ?? 0;
+        mapa.set(chave, atual + Number(linha.total));
+      }
+
+      return Array.from(eixo, ([chave, label]) => ({
+        data: label,
+        entrada: mapa.get(`${chave}|entrada`) ?? 0,
+        saida: mapa.get(`${chave}|saida`) ?? 0,
+      }));
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new InternalServerErrorException(
+        'Erro ao buscar fluxo da movimentação',
+      );
+    }
+  }
+  private opcaoPeriodo(periodo: string): OpcaoData {
+    if (periodo === '3meses') return 'semana';
+    if (periodo === '1ano') return 'mes';
+    return 'dia';
+  }
+  private inicioDoDia(data: Date, opcaoPeriodo: OpcaoData): Date {
+    const d = new Date(data);
+
+    d.setHours(0, 0, 0, 0);
+    if (opcaoPeriodo === 'semana') {
+      const dia = d.getDay();
+      const diaInicio = d.getDate() - dia + (dia === 0 ? -6 : 1);
+      d.setDate(diaInicio);
+    } else if (opcaoPeriodo === 'mes') {
+      d.setDate(1);
+    }
+    return d;
+  }
+  private formataData(d: Date): string {
+    const ano = d.getFullYear();
+    const mes = String(d.getMonth() + 1).padStart(2, '0');
+    const dia = String(d.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+  }
+  private labelData(d: Date, opcaoPeriodo: OpcaoData): string {
+    if (opcaoPeriodo === 'mes') {
+      return d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' });
+    }
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+  }
+  private periodoDias(periodo): number {
+    const mapa: Record<string, number> = {
+      '7dias': 7,
+      '30dias': 30,
+      '3meses': 90,
+      '1ano': 365,
+    };
+
+    return mapa[periodo] ?? 30;
+  }
+}
